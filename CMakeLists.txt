@@ -2,9 +2,6 @@ cmake_minimum_required (VERSION 3.1)
 
 project (colony)
 
-# Link SFML statically
-# set (SFML_STATIC_LIBRARIES TRUE)
-
 set (PROJECT_SOURCE_DIR "src")
 set (PROJECT_INCLUDE_DIR "src/include")
 set (PROJECT_BINARY_DIR "bin")
@@ -23,3 +20,5 @@ add_executable (colony "${PROJECT_SOURCE_DIR}/main.cpp")
 target_link_libraries (colony sfml-graphics sfml-audio)
 
 install (TARGETS colony DESTINATION bin)
+install (FILES "${PROJECT_BINARY_DIR}/config.hpp"
+         DESTINATION include)

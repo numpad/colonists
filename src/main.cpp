@@ -1,6 +1,10 @@
+#include <stdio.h>
 #include <SFML/Graphics.hpp>
+#include "config.hpp"
 
 int main(int argc, char *argv[]) {
+	
+	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
 	sf::RenderWindow window(
 		sf::VideoMode(800, 600),
