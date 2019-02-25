@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "config.hpp"
 
-#include "RenderStates/State.hpp"
+#include "RenderStates/StateManager.hpp"
 #include "RenderStates/GameState.hpp"
 
 int main(int argc, char *argv[]) {
@@ -18,22 +18,21 @@ int main(int argc, char *argv[]) {
 		sf::VideoMode::getDesktopMode().height * 0.5 - window.getSize().y * 0.5
 	));
 	
-	State *state = new GameState();
+	StateManager smanager;
+	smanager.load(new GameState());
 	
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
-			state->onEvent(event);
+			smanager.handleEvent(event);
 			
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
 		
-		state->onRender(window);
+		smanager.render(window);
 		window.display();
 	}
-	
-	delete state;
 	
 	return 0;
 }
