@@ -20,8 +20,13 @@ configure_file (
 include_directories ("${PROJECT_BINARY_DIR}")
 include_directories ("${PROJECT_INCLUDE_DIR}")
 
+file (GLOB source_files
+	"${PROJECT_SOURCE_DIR}/*.cpp"
+	"${PROJECT_SOURCE_DIR}/*/*.cpp"
+)
+
 find_package (SFML 2.5 COMPONENTS graphics audio REQUIRED)
-add_executable (colony "${PROJECT_SOURCE_DIR}/main.cpp")
+add_executable (colony "${PROJECT_SOURCE_DIR}/main.cpp" ${source_files})
 target_link_libraries (colony sfml-graphics sfml-audio)
 
 install (TARGETS colony DESTINATION bin)
