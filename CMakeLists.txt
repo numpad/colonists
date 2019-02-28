@@ -20,12 +20,15 @@ configure_file (
 )
 include_directories ("${PROJECT_BINARY_DIR}")
 include_directories ("${PROJECT_INCLUDE_DIR}")
+include_directories ("${PROJECT_LIBRARY_DIR}")
 
 file (GLOB source_files
 	"${PROJECT_SOURCE_DIR}/*.cpp"
 	"${PROJECT_SOURCE_DIR}/*/*.cpp"
+	"${PROJECT_LIBRARY_DIR}/FastNoise/*.cpp"
 )
 
+find_package (glm)
 find_package (SFML 2.5 COMPONENTS graphics audio REQUIRED)
 add_executable (colony "${PROJECT_BASE_SRC}/main.cpp" ${source_files})
 target_link_libraries (colony sfml-graphics sfml-audio)

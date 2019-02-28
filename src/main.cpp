@@ -5,6 +5,8 @@
 #include "RenderStates/StateManager.hpp"
 #include "RenderStates/GameState.hpp"
 
+#include "Tilemap.hpp"
+
 int main(int argc, char *argv[]) {
 	
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
@@ -17,6 +19,7 @@ int main(int argc, char *argv[]) {
 		sf::VideoMode::getDesktopMode().width  * 0.5 - window.getSize().x * 0.5,
 		sf::VideoMode::getDesktopMode().height * 0.5 - window.getSize().y * 0.5
 	));
+	window.setVerticalSyncEnabled(true);
 	
 	StateManager smanager;
 	smanager.load(new GameState());
@@ -28,7 +31,11 @@ int main(int argc, char *argv[]) {
 			
 			if (event.type == sf::Event::Closed)
 				window.close();
+			else if (event.type == sf::Event::Resized) {
+				//window.getDefaultView()
+			}
 		}
+		
 		
 		smanager.render(window);
 		window.display();
