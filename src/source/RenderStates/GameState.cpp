@@ -1,7 +1,7 @@
 #include "RenderStates/GameState.hpp"
 
 GameState::GameState()
-	: map(128, 128)
+	: map(128, 128), camera(sf::Vector2f(0, 0), sf::Vector2f(800, 600))
 {
 	
 }
@@ -12,20 +12,29 @@ GameState::~GameState() {
 
 void GameState::onRender(sf::RenderTarget &target) {
 	target.clear();
+	target.setView(camera);
+	
+	auto pc = target.mapPixelToCoords(sf::Vector2i(mouseX, mouseY));
+	glm::vec2 mouse_world(pc.x, pc.y);
+	int tileX, tileY;
+	map.mapToTile(mouse_world, &tileX, &tileY);
 	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		map.move(0,  10);
+		camera.move(0, -10);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		map.move(0, -10);
+		camera.move(0,  10);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		map.move( 10,  0);
+		camera.move(-10,  0);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		map.move(-10,  0);
+		camera.move( 10,  0);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		camera.zoom(1.1);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		camera.zoom(0.9);
 	
-	
-	map.setColor(mouseX / map.getTilesize(), mouseY / map.getTilesize(), sf::Color::Red);
+	map.setColor(tileX, tileY, sf::Color::Red);
 	target.draw(map);
-	map.setColor(mouseX / map.getTilesize(), mouseY / map.getTilesize(), sf::Color::White);
+	map.setColor(tileX, tileY, sf::Color::White);
 }
 
 void GameState::onEvent(sf::Event &event) {
@@ -33,6 +42,9 @@ void GameState::onEvent(sf::Event &event) {
 		case sf::Event::MouseMoved:
 			this->mouseX = event.mouseMove.x;
 			this->mouseY = event.mouseMove.y;
+			break;
+		case sf::Event::Resized:
+			camera.setSize(event.size.width, event.size.height);
 			break;
 		default: break;
 	};

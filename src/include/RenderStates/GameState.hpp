@@ -10,7 +10,7 @@ class GameState : public State {
 	Tilemap map;
 	float mouseX, mouseY;
 	
-	
+	sf::View camera;
 public:
 	
 	GameState();
