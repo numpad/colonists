@@ -11,9 +11,13 @@ int main(int argc, char *argv[]) {
 	
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
+	sf::ContextSettings ctx(0, 0, 0, 3, 0);
+	
 	sf::RenderWindow window(
 		sf::VideoMode(800, 600),
-		"main"
+		"main",
+		sf::Style::Default,
+		ctx
 	);
 	window.setPosition(sf::Vector2i(
 		sf::VideoMode::getDesktopMode().width  * 0.5 - window.getSize().x * 0.5,
@@ -22,7 +26,7 @@ int main(int argc, char *argv[]) {
 	window.setVerticalSyncEnabled(true);
 	
 	StateManager smanager;
-	smanager.load(new GameState());
+	smanager.load(new GameState(window));
 	
 	while (window.isOpen()) {
 		sf::Event event;

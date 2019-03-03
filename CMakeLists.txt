@@ -14,6 +14,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}")
 
 set (CFG_VERSION_MAJOR 0)
 set (CFG_VERSION_MINOR 1)
+set (CFG_DEBUG true)
 configure_file (
 	"${PROJECT_BASE_SRC}/config.hpp.in"
 	"${PROJECT_BINARY_DIR}/config.hpp"
@@ -28,6 +29,7 @@ file (GLOB source_files
 	"${PROJECT_LIBRARY_DIR}/FastNoise/*.cpp"
 )
 
+find_package (GLEW)
 find_package (glm)
 find_package (SFML 2.5 COMPONENTS graphics audio REQUIRED)
 add_executable (colony "${PROJECT_BASE_SRC}/main.cpp" ${source_files})

@@ -9,20 +9,29 @@
 #include "FastNoise/FastNoise.h"
 
 class Tilemap : public sf::Drawable, public sf::Transformable {
-	
+	// map tile(s) data
 	int width, height;
-	int tilesize, tilesetSize;
+	int tilesize;
 	
+	// tileset data
+	int tilesetCols, tilesetRows;
+	int tilesetSize;
+	
+	sf::Shader tileTransition;
+	sf::Texture *tileset;
 	sf::VertexArray mapVertices;
-	sf::Texture tileset;
 	
 	sf::Vertex *getVertices(int x, int y);
 	void make_square_vertex(sf::Vertex *vertices, int tile_id, int x, int y);
 	
 	bool validTilePos(int x, int y);
+	int tileCoordsToID(int tx, int ty);
+	
 public:
 	
 	Tilemap(int width, int height);
+	
+	void setTileset(sf::Texture *texture, int cols, int rows, int tilesetSize);
 	
 	int getTilesize() const;
 	int getWidth() const;
@@ -31,7 +40,7 @@ public:
 	// Maps a point in worldspace to a tile.
 	void mapToTile(glm::vec2 point, int *tx, int *ty);
 	
-	void setColor(int x, int y, sf::Color c);
+	void setTileColor(int x, int y, sf::Color c);
 	void setTileID(int x, int y, int tile_id);
 	
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
