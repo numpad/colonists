@@ -75,10 +75,13 @@ int main(int argc, char *argv[]) {
 		
 		uniform mat3 uProjection;
 		uniform mat3 uView;
+		
 		layout (location = 0) in vec2 aPos;
+		out vec2 vPos;
 		
 		void main() {
-			gl_Position.xyz = uProjection * uView * vec3(aPos, 1);
+			vPos = aPos;
+			gl_Position.xyz = uProjection * uView * vec3(aPos, 1.0);
 			gl_Position.w = 1.0;
 		}
 	)", sgl::shader::VERTEX);
@@ -86,10 +89,12 @@ int main(int argc, char *argv[]) {
 	shader.load_from_memory(R"(
 		#version 330 core
 		
+		in vec2 vPos;
 		out vec4 FragColor;
+		
 		void main() {
 			
-			FragColor = vec4(0, 1, 0, 1);
+			FragColor = vec4(vPos.x * 0.5 + 0.5, vPos.y * 0.5 + 0.5, 0.5, 1.0);
 		}
 	)", sgl::shader::FRAGMENT);
 	shader.compile();

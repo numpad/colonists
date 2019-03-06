@@ -27,6 +27,10 @@ public:
 	void close();
 	
 	void display();
+	
+	operator GLFWwindow*() const {
+		return window;
+	}
 };
 
 #endif

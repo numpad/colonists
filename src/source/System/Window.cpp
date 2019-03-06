@@ -81,4 +81,3 @@ void Window::registerCallbacks() {
 	glfwSetFramebufferSizeCallback(window, setWindowViewport);
 	glfwSetCursorPosCallback(window, setMousePos);
 }
-
