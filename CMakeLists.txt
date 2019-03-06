@@ -2,6 +2,9 @@ cmake_minimum_required (VERSION 3.1)
 
 project (colony LANGUAGES CXX)
 
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set (PROJECT_BASE_SRC "src")
 set (PROJECT_SOURCE_DIR "${PROJECT_BASE_SRC}/source")
 set (PROJECT_BINARY_DIR "bin")
@@ -26,14 +29,20 @@ include_directories ("${PROJECT_LIBRARY_DIR}")
 file (GLOB source_files
 	"${PROJECT_SOURCE_DIR}/*.cpp"
 	"${PROJECT_SOURCE_DIR}/*/*.cpp"
-	"${PROJECT_LIBRARY_DIR}/FastNoise/*.cpp"
+	"${PROJECT_LIBRARY_DIR}/*/*.cpp"
 )
 
-find_package (GLEW)
-find_package (glm)
-find_package (SFML 2.5 COMPONENTS graphics audio REQUIRED)
+set (OpenGL_GL_PREFERENCE GLVND)
+find_package (OpenGL REQUIRED)
+find_package (glfw3 REQUIRED)
+find_package (glm REQUIRED)
+
 add_executable (colony "${PROJECT_BASE_SRC}/main.cpp" ${source_files})
-target_link_libraries (colony sfml-graphics sfml-audio)
+target_link_libraries (colony
+                       GL
+                       glfw
+                       dl
+)
 
 install (TARGETS colony DESTINATION bin)
 install (FILES "${PROJECT_BINARY_DIR}/config.hpp"
