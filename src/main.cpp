@@ -4,7 +4,10 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <stb/stb_image.h>
+
 #include "GLWrapper/sgl_shader.hpp"
+#include "GLWrapper/Texture.hpp"
 
 #include "System/Window.hpp"
 
@@ -67,6 +70,9 @@ int main(int argc, char *argv[]) {
 		0, 1, 2, 2, 1, 3
 	};
 	
+	Texture texture;
+	texture.load("res/tileset.png");
+	
 	Mesh screen = createMesh(vertices, 8, indices, 6);
 	
 	sgl::shader shader;
@@ -88,13 +94,14 @@ int main(int argc, char *argv[]) {
 	
 	shader.load_from_memory(R"(
 		#version 330 core
+		uniform sampler2D uTexture;
 		
 		in vec2 vPos;
 		out vec4 FragColor;
 		
 		void main() {
-			
-			FragColor = vec4(vPos.x * 0.5 + 0.5, vPos.y * 0.5 + 0.5, 0.5, 1.0);
+			vec4 tex = texture(uTexture, vPos * 0.5 + 0.5);
+			FragColor = vec4(tex.rgb, tex.a);
 		}
 	)", sgl::shader::FRAGMENT);
 	shader.compile();
@@ -104,32 +111,35 @@ int main(int argc, char *argv[]) {
 		glClearColor(0.3, 0.3, 0.45, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		glm::mat3 mView(
-			200, 0, window.mouse.x * 2.0 - window.width,
-			0, 200, window.mouse.y * -2.0 + window.height,
-			0, 0, 1
-		);
+		glEnable(GL_BLEND);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		
-		glm::mat3 mProj(
-			1./window.width, 0, 0,
-			0, 1./window.height, 0,
+		glm::mat3 mView(
+			120, 0, window.mouse.x * 2.0 - window.width,
+			0, 120, window.mouse.y * -2.0 + window.height,
 			0, 0, 1
 		);
 		
 		shader.use();
 		shader["uView"] = glm::transpose(mView);
-		shader["uProjection"] = glm::transpose(mProj);
+		shader["uProjection"] = window.getProjection();
+		shader["uTexture"] = 0;
 		
+		texture.active(0);
+		texture.bind(true);
 		glBindVertexArray(screen.vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen.indices);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *)0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+		texture.bind(false);
+		
 		
 		window.display();
 		glfwPollEvents();
 	}
 	
+	texture.destroy();
 	screen.destroy();
 	
 	window.close();

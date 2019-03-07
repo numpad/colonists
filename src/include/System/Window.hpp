@@ -9,6 +9,7 @@
 class Window {
 	
 	GLFWwindow *window = nullptr;
+	glm::mat3 projection;
 	
 	void registerCallbacks();
 	
@@ -22,6 +23,9 @@ public:
 	~Window();
 	
 	bool isOpen();
+	
+	void setProjectionMatrix(int width, int height);
+	glm::mat3& getProjection();
 	
 	void resize(int width, int height);
 	void close();

@@ -4,6 +4,7 @@ static void setWindowViewport(GLFWwindow *window, int w, int h) {
 	Window *win = (Window *)glfwGetWindowUserPointer(window);
 	
 	glViewport(0, 0, w, h);
+	win->setProjectionMatrix(w, h);
 	win->width = w;
 	win->height = h;
 }
@@ -30,7 +31,7 @@ bool Window::Init() {
 }
 
 Window::Window(int width, int height, std::string title, bool fullscreen)
-	: width(width), height(height)
+	: width(width), height(height), projection(1.0f)
 {
 	
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -48,15 +49,27 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 	glfwSwapInterval(1); // enable vsync
 	
 	registerCallbacks();
+	
+	setProjectionMatrix(width, height);
 }
 
 Window::~Window() {
 }
 
+void Window::setProjectionMatrix(int width, int height) {
+	this->projection[0][0] = 1.0f / (float)width;
+	this->projection[1][1] = 1.0f / (float)height;
+}
+
+
 bool Window::isOpen() {
 	if (!window) return false;
 	
 	return !glfwWindowShouldClose(window);
+}
+
+glm::mat3& Window::getProjection() {
+	return this->projection;
 }
 
 void Window::resize(int w, int h) {
