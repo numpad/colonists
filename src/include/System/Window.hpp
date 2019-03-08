@@ -15,8 +15,6 @@ class Window {
 	
 public:
 	int width, height;
-	glm::vec2 mouse;
-	
 	static bool Init();
 	
 	Window(int width, int height, std::string title, bool fullscreen = false);

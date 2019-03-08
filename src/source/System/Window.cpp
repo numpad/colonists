@@ -9,12 +9,6 @@ static void setWindowViewport(GLFWwindow *window, int w, int h) {
 	win->height = h;
 }
 
-static void setMousePos(GLFWwindow *window, double mx, double my) {
-	Window *win = (Window *)glfwGetWindowUserPointer(window);
-	win->mouse.x = mx;
-	win->mouse.y = my;
-}
-
 static void printError(int err, const char *desc) {
 	fprintf(stderr, "Error #%d: %s\n", err, desc);
 }
@@ -41,7 +35,8 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 	window = glfwCreateWindow(
 		width, height,
 		title.c_str(),
-		fullscreen ? glfwGetPrimaryMonitor() : nullptr, nullptr);
+		fullscreen ? glfwGetPrimaryMonitor() : nullptr,
+		nullptr);
 	
 	glfwSetWindowUserPointer(window, this);
 	glfwMakeContextCurrent(window);
@@ -58,7 +53,9 @@ Window::~Window() {
 
 void Window::setProjectionMatrix(int width, int height) {
 	this->projection[0][0] = 1.0f / (float)width;
-	this->projection[1][1] = 1.0f / (float)height;
+	this->projection[1][1] = -1.0f / (float)height;
+	projection[0][2] = -1.0f;
+	projection[1][2] = 1.0f;
 }
 
 
@@ -92,5 +89,4 @@ void Window::display() {
 void Window::registerCallbacks() {
 	if (!window) return;
 	glfwSetFramebufferSizeCallback(window, setWindowViewport);
-	glfwSetCursorPosCallback(window, setMousePos);
 }

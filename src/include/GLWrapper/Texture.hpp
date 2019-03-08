@@ -6,6 +6,8 @@
 #include <stb/stb_image.h>
 
 class Texture {
+	bool generateMipmapOnLoad = false;
+	
 	GLuint texture;
 	
 	int width, height;

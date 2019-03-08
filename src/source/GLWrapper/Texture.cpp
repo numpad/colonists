@@ -47,6 +47,8 @@ void Texture::loadTextureFromMemory(GLubyte *bitmap) {
 		bitmap
 	);
 	
+	if (generateMipmapOnLoad) glGenerateMipmap(GL_TEXTURE_2D);
+	
 	bind(false);
 }
 
@@ -78,4 +80,5 @@ void Texture::bind(bool active) {
 
 void Texture::active(int unit) {
 	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D, texture);
 }
