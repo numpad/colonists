@@ -10,7 +10,8 @@ Tilemap::Tilemap(int w, int h):
 	tiledrawer("res/glsl/tilemap/drawsimple.vert.glsl", "res/glsl/tilemap/drawsimple.frag.glsl"),
 	tileVertexData((w+1) * (h+1) * 2),
 	tileIndexData(w * h * 6),
-	tileIDs(w * h)
+	tileIDs(w * h),
+	tileTexCoordData(w * h * 6)
 {
 	this->loadTileset("res/tileset.png");
 	this->loadTileVertices();
@@ -28,7 +29,9 @@ void Tilemap::loadTileset(std::string path) {
 		delete tileset;
 	}
 	tileset = new Texture();
-	tileset->load(path);
+	if (!tileset->load(path)) {
+		fprintf(stderr, "Error: could not load tileset!\n");
+	}
 	
 }
 
@@ -37,6 +40,7 @@ void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView) {
 	tiledrawer["uProjection"] = glm::transpose(uProjection);
 	tiledrawer["uView"] = glm::transpose(uView);
 	tiledrawer["uTileset"] = 0;
+	tiledrawer["uTilesize"] = (float)tilesize;
 	
 	tileset->active(0);
 	tiledrawer.use();
@@ -52,10 +56,27 @@ void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView) {
 
 /// PRIVATE
 
+void Tilemap::setTileTexCoords(int tx, int ty, glm::vec2 s) {
+	(void)tileTexCoordData;
+	
+	const glm::vec2 tRight = glm::vec2((float)tilesetTilesize, 0.0f) / 960.0f;
+	const glm::vec2 tDown  = glm::vec2(0.0f, (float)tilesetTilesize) / 960.0f;
+	
+	int i = tileToIndex(tx, ty, width, height);
+	
+	tileTexCoordData.at(i * 6 + 0) = s;
+	tileTexCoordData.at(i * 6 + 1) = s + tRight;
+	tileTexCoordData.at(i * 6 + 2) = s + tDown;
+	tileTexCoordData.at(i * 6 + 3) = s + tRight;
+	tileTexCoordData.at(i * 6 + 4) = s + tDown + tRight;
+	tileTexCoordData.at(i * 6 + 5) = s + tDown;
+}
+
 void Tilemap::loadTileVertices() {
 	glGenVertexArrays(1, &tilesVAO);
 	glGenBuffers(1, &tilesVBO);
 	glGenBuffers(1, &tilesIndices);
+	glGenBuffers(1, &tilesTexCoords);
 	
 	this->generateTileVertices();
 	
@@ -72,6 +93,16 @@ void Tilemap::loadTileVertices() {
 		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		
+		
+		glBindBuffer(GL_ARRAY_BUFFER, tilesTexCoords);
+		
+		glBufferData(GL_ARRAY_BUFFER,
+			tileTexCoordData.size() * 2 * sizeof(GLfloat),
+			&tileTexCoordData[0], GL_STATIC_DRAW);
+		
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -101,6 +132,7 @@ void Tilemap::generateTileVertices() {
 			
 			if (x < width && y < height) {
 				setSingleTileIndices(tileIndexData, x, y, width, height);
+				setTileTexCoords(x, y, glm::vec2(0.0f));
 			}
 		}
 	}
@@ -110,4 +142,5 @@ void Tilemap::destroyTileVertices() {
 	glDeleteVertexArrays(1, &tilesVAO);
 	glDeleteBuffers(1, &tilesVBO);
 	glDeleteBuffers(1, &tilesIndices);
+	glDeleteBuffers(1, &tilesTexCoords);
 }

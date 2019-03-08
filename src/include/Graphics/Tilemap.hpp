@@ -14,15 +14,18 @@ class Tilemap {
 	sgl::shader tiledrawer;
 	Texture *tileset = nullptr;
 	int width, height; // tile grid size: (width, height)
-	int tilesize = 128;
+	int tilesize = 128, tilesetTilesize = 96;
 	
 	std::vector<GLfloat> tileVertexData;
+	std::vector<glm::vec2> tileTexCoordData;
 	std::vector<GLuint> tileIndexData, tileIDs;
-	GLuint tilesVAO, tilesVBO, tilesIndices;
+	GLuint tilesVAO, tilesVBO, tilesIndices, tilesTexCoords;
 	
 	void loadTileVertices();
 	void generateTileVertices();
 	void destroyTileVertices();
+	
+	void setTileTexCoords(int tx, int ty, glm::vec2 s);
 public:
 	
 	Tilemap(int width, int height);

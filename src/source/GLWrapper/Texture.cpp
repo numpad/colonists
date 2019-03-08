@@ -2,7 +2,7 @@
 
 static void read_bitmap_to_texture(Texture *texture, std::string path) {
 	int width, height, channels;
-	stbi_set_flip_vertically_on_load(1);
+	stbi_set_flip_vertically_on_load(0);
 	GLubyte *bitmap = stbi_load(path.c_str(), &width, &height, &channels, 0);
 	
 	texture->setTextureData(width, height, channels);
@@ -29,10 +29,10 @@ void Texture::setTextureData(int w, int h, int ch) {
 void Texture::loadTextureFromMemory(GLubyte *bitmap) {
 	glGenTextures(1, &this->texture);
 	
-	set(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	set(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	set(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	set(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	set(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	set(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	set(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	set(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	
 	bind(true);
 	
