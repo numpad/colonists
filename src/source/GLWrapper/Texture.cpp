@@ -31,8 +31,8 @@ void Texture::loadTextureFromMemory(GLubyte *bitmap) {
 	
 	set(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	set(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	set(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	set(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	set(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	set(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	
 	bind(true);
 	

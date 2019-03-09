@@ -12,6 +12,11 @@
 #include "System/Window.hpp"
 #include "Graphics/Tilemap.hpp"
 
+static inline void onPressRenderWireframe(GLFWwindow *win, int key) {
+	glPolygonMode(GL_FRONT_AND_BACK,
+		(glfwGetKey(win, key) == GLFW_PRESS) ? GL_LINE : GL_FILL);
+}
+
 int main(int argc, char *argv[]) {
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
@@ -21,7 +26,9 @@ int main(int argc, char *argv[]) {
 	if (gl3wInit()) {
 		fprintf(stderr, "gl3wInit() failed.\n");
 	}
-	printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
+	printf("OpenGL %s, GLSL %s\n",
+		glGetString(GL_VERSION),
+		glGetString(GL_SHADING_LANGUAGE_VERSION));
 	
 	
 	int cw, ch, cch;
@@ -32,9 +39,15 @@ int main(int argc, char *argv[]) {
 	GLFWcursor *cursor = glfwCreateCursor(&img, 0, 0);
 	glfwSetCursor(window, cursor);
 	
-	Tilemap tilemap(2, 2);
+	Tilemap tilemap(30, 30);
 	
-	
+	int tW, tH;
+	tilemap.getSize(&tW, &tH);
+	for (int y = 0; y < tW; ++y) {
+		for (int x = 0; x < tH; ++x) {
+			tilemap.setTileID(x, y, 10 + rand() % 4);
+		}
+	}
 	
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,
@@ -43,6 +56,9 @@ int main(int argc, char *argv[]) {
 	);
 	
 	while (window.isOpen()) {
+		/* debug */
+		onPressRenderWireframe(window, GLFW_KEY_R);
+		
 		/* update */
 		static glm::vec2 mouse, pMouse, dMouse; // current, prev, delta
 		static double mDX, mDY;

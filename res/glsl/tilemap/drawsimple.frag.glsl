@@ -14,6 +14,5 @@ void main() {
 	
 	vec2 texCoords = tile * mod((vPosition) / uTilesize, 1.0);
 	
-	FragColor = vec4(vTexCoords.xy * 10.0, 0.0, 1.0);
-	//FragColor = texture(uTileset, vTexCoords);
+	FragColor = texture(uTileset, vTexCoords);
 }
