@@ -32,7 +32,9 @@ int main(int argc, char *argv[]) {
 	GLFWcursor *cursor = glfwCreateCursor(&img, 0, 0);
 	glfwSetCursor(window, cursor);
 	
-	Tilemap tilemap(512, 512);
+	Tilemap tilemap(2, 2);
+	
+	
 	
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,

@@ -42,10 +42,13 @@ void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView) {
 	tiledrawer["uTileset"] = 0;
 	tiledrawer["uTilesize"] = (float)tilesize;
 	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
 	tileset->active(0);
 	tiledrawer.use();
 	glBindVertexArray(tilesVAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tilesIndices);
+	
 	glDrawElements(GL_TRIANGLES, width * height * 6, GL_UNSIGNED_INT, (void *)0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -64,12 +67,12 @@ void Tilemap::setTileTexCoords(int tx, int ty, glm::vec2 s) {
 	
 	int i = tileToIndex(tx, ty, width, height);
 	
-	tileTexCoordData.at(i * 6 + 0) = s;
-	tileTexCoordData.at(i * 6 + 1) = s + tRight;
-	tileTexCoordData.at(i * 6 + 2) = s + tDown;
-	tileTexCoordData.at(i * 6 + 3) = s + tRight;
-	tileTexCoordData.at(i * 6 + 4) = s + tDown + tRight;
-	tileTexCoordData.at(i * 6 + 5) = s + tDown;
+	tileTexCoordData.at(i * 6 + 0) = glm::vec2(0.0f, 0.0f);
+	tileTexCoordData.at(i * 6 + 1) = glm::vec2(0.1f, 0.0f);
+	tileTexCoordData.at(i * 6 + 2) = glm::vec2(0.0f, 0.1f);
+	tileTexCoordData.at(i * 6 + 3) = glm::vec2(0.1f, 0.0f);
+	tileTexCoordData.at(i * 6 + 4) = glm::vec2(0.1f, 0.1f);
+	tileTexCoordData.at(i * 6 + 5) = glm::vec2(0.0f, 0.1f);
 }
 
 void Tilemap::loadTileVertices() {
@@ -99,13 +102,13 @@ void Tilemap::loadTileVertices() {
 		
 		glBufferData(GL_ARRAY_BUFFER,
 			tileTexCoordData.size() * 2 * sizeof(GLfloat),
-			&tileTexCoordData[0], GL_STATIC_DRAW);
+			(GLfloat *)&tileTexCoordData[0], GL_STATIC_DRAW);
 		
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 		
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 

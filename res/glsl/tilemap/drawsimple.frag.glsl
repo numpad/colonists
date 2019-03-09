@@ -9,13 +9,11 @@ in vec2 vTexCoords;
 out vec4 FragColor;
 
 void main() {
-	vec2 id = ceil(vPosition / uTilesize);
+	const float pixel = 1.0 / 960.0;
+	const float tile = 96.0 / 960.0;
 	
-	vec2 texCoords = (96.0 / 960.0f) * (mod((vPosition + 1.0 / 960.0) / uTilesize, 1.0));
-	texCoords = clamp(texCoords, 0., 1.);
-	FragColor = texture(uTileset, texCoords);
+	vec2 texCoords = tile * mod((vPosition) / uTilesize, 1.0);
 	
-	if (int(ceil(id.x)) % 2 == int(ceil(id.y)) % 2) {
-		FragColor.rgb = FragColor.brg;
-	}
+	FragColor = vec4(vTexCoords.xy * 10.0, 0.0, 1.0);
+	//FragColor = texture(uTileset, vTexCoords);
 }
