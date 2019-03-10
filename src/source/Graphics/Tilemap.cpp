@@ -33,16 +33,22 @@ void Tilemap::getSize(int *cols, int *rows) {
 	if (rows) *rows = height;
 }
 
-void Tilemap::setTileID(int x, int y, int id) {
+void Tilemap::setTileID(int x, int y, int id, bool is_last) {
+	// tile on tileset texture
 	int tx, ty;
 	indexToTile(id, &tx, &ty, tilesetSize, tilesetSize);
+	// tile on map
+	GLintptr index = tileToIndex(x, y, width, height);
 	
 	setTileTexCoords(x, y, glm::vec2((float)tx, (float)ty));
 	glBindBuffer(GL_ARRAY_BUFFER, tilesTexCoords);
-	glBufferData(GL_ARRAY_BUFFER,
-		tileTexCoordData.size() * 2 * sizeof(GLfloat),
-		&tileTexCoordData[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBufferSubData(GL_ARRAY_BUFFER,
+		index * 6 * 2 * sizeof(GLfloat), 6 * 2 * sizeof(GLfloat),
+		&tileTexCoordData[index * 6]);
+	
+	// avoid unnecesarry buffer switches when setting multiple tile ids
+	if (is_last)
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Tilemap::loadTileset(std::string path) {
@@ -84,28 +90,35 @@ int Tilemap::getTilesetSizeInPixels() {
 void Tilemap::setTileVertices(int tx, int ty) {
 	int i = tileToIndex(tx, ty, width, height);
 	
-	glm::vec2 pos((float)tx * (float)tilesize, (float)ty * (float)tilesize);
+	glm::vec2 pos(
+		(float)tx * (float)tilesize,
+		(float)ty * (float)tilesize);
+	glm::vec2 off(
+		(float)width * (float)tilesize * -0.5f,
+		(float)height * (float)tilesize * -0.5f);
+	
 	glm::vec2 tRight = glm::vec2((float)tilesize, 0.0f);
 	glm::vec2 tDown = glm::vec2(0.0f, (float)tilesize);
 	
-	tileVertexData.at(i * 6 + 0) = pos;
-	tileVertexData.at(i * 6 + 1) = pos + tRight;
-	tileVertexData.at(i * 6 + 2) = pos + tDown;
-	tileVertexData.at(i * 6 + 3) = pos + tRight;
-	tileVertexData.at(i * 6 + 4) = pos + tRight + tDown;
-	tileVertexData.at(i * 6 + 5) = pos + tDown;
+	tileVertexData.at(i * 6 + 0) = off + pos;
+	tileVertexData.at(i * 6 + 1) = off + pos + tRight;
+	tileVertexData.at(i * 6 + 2) = off + pos + tDown;
+	tileVertexData.at(i * 6 + 3) = off + pos + tRight;
+	tileVertexData.at(i * 6 + 4) = off + pos + tRight + tDown;
+	tileVertexData.at(i * 6 + 5) = off + pos + tDown;
 }
 
 void Tilemap::setTileTexCoords(int tx, int ty, glm::vec2 s) {
-	float n_tilesize = 1.0f / (float)tilesetSize;
+	float pixel = 0.0001 / getTilesetSizeInPixels();
+	float n_tilesize = 1.0 / (double)tilesetSize;
 	int i = tileToIndex(tx, ty, width, height);
 	
-	tileTexCoordData.at(i * 6 + 0) = s * n_tilesize + glm::vec2(0.0f,        0.0f);
-	tileTexCoordData.at(i * 6 + 1) = s * n_tilesize + glm::vec2(n_tilesize,  0.0f);
-	tileTexCoordData.at(i * 6 + 2) = s * n_tilesize + glm::vec2(0.0f,        n_tilesize);
-	tileTexCoordData.at(i * 6 + 3) = s * n_tilesize + glm::vec2(n_tilesize,  0.0f);
-	tileTexCoordData.at(i * 6 + 4) = s * n_tilesize + glm::vec2(n_tilesize,  n_tilesize);
-	tileTexCoordData.at(i * 6 + 5) = s * n_tilesize + glm::vec2(0.0f,        n_tilesize);
+	tileTexCoordData.at(i * 6 + 0) = s * n_tilesize + glm::vec2(0.0f + pixel,        0.0f + pixel);
+	tileTexCoordData.at(i * 6 + 1) = s * n_tilesize + glm::vec2(n_tilesize - pixel,  0.0f + pixel);
+	tileTexCoordData.at(i * 6 + 2) = s * n_tilesize + glm::vec2(0.0f + pixel,        n_tilesize - pixel);
+	tileTexCoordData.at(i * 6 + 3) = s * n_tilesize + glm::vec2(n_tilesize - pixel,  0.0f + pixel);
+	tileTexCoordData.at(i * 6 + 4) = s * n_tilesize + glm::vec2(n_tilesize - pixel,  n_tilesize - pixel);
+	tileTexCoordData.at(i * 6 + 5) = s * n_tilesize + glm::vec2(0.0f + pixel,        n_tilesize - pixel);
 }
 
 void Tilemap::loadTileVertices() {

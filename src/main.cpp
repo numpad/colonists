@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
-
+#include <FastNoise/FastNoise.h>
 #include <stb/stb_image.h>
 
 #include "GLWrapper/sgl_shader.hpp"
@@ -11,10 +11,17 @@
 
 #include "System/Window.hpp"
 #include "Graphics/Tilemap.hpp"
+#include "MapGen/MapGen.hpp"
+#include "MapGen/SimpleMapGen.hpp"
 
 static inline void onPressRenderWireframe(GLFWwindow *win, int key) {
 	glPolygonMode(GL_FRONT_AND_BACK,
 		(glfwGetKey(win, key) == GLFW_PRESS) ? GL_LINE : GL_FILL);
+}
+
+float deltaScroll = 0.0f;
+static void onScrollSetGlobal(GLFWwindow *window, double xoff, double yoff) {
+	deltaScroll = yoff;
 }
 
 int main(int argc, char *argv[]) {
@@ -30,7 +37,7 @@ int main(int argc, char *argv[]) {
 		glGetString(GL_VERSION),
 		glGetString(GL_SHADING_LANGUAGE_VERSION));
 	
-	
+	/* glfw setup */
 	int cw, ch, cch;
 	GLubyte *cdata = stbi_load("res/images/cursor/pointer.png", &cw, &ch, &cch, 0);
 	GLFWimage img;
@@ -38,17 +45,18 @@ int main(int argc, char *argv[]) {
 	img.pixels = cdata;
 	GLFWcursor *cursor = glfwCreateCursor(&img, 0, 0);
 	glfwSetCursor(window, cursor);
+	glfwSetScrollCallback(window, onScrollSetGlobal);
 	
-	Tilemap tilemap(30, 30);
+	Tilemap tilemap(500, 500);
 	
-	int tW, tH;
-	tilemap.getSize(&tW, &tH);
-	for (int y = 0; y < tW; ++y) {
-		for (int x = 0; x < tH; ++x) {
-			tilemap.setTileID(x, y, 10 + rand() % 4);
-		}
-	}
+	SimpleMapGenerator mgen;
 	
+	double begin_s = glfwGetTime();
+	mgen.generate(tilemap);
+	double end_s = glfwGetTime();
+	double dt = end_s - begin_s;
+	printf("generating world took %g ms.\n", dt * 1000.0f);
+
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,
 		0, 1, 0, //window.mouse.y * -2.0 + window.height,
@@ -56,6 +64,8 @@ int main(int argc, char *argv[]) {
 	);
 	
 	while (window.isOpen()) {
+		glfwPollEvents();
+		
 		/* debug */
 		onPressRenderWireframe(window, GLFW_KEY_R);
 		
@@ -73,17 +83,24 @@ int main(int argc, char *argv[]) {
 			mView[1][2] += dMouse.y * 2.0f;
 		}
 		
+		float zoomFactor = 1.0f + deltaScroll * 0.1f;
+		mView[0][0] *= zoomFactor;
+		mView[1][1] *= zoomFactor;
+		
+		
 		/* draw */
 		glClearColor(0.3, 0.3, 0.45, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glEnable(GL_BLEND);
+		glDisable(GL_BLEND);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		
 		tilemap.draw(window.getProjection(), mView);
 		
 		window.display();
-		glfwPollEvents();
+		
+		/* after frame stuff */
 		pMouse = mouse;
+		deltaScroll = 0.0f;
 	}
 		
 	stbi_image_free(cdata);
