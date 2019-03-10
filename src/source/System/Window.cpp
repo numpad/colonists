@@ -54,8 +54,8 @@ Window::~Window() {
 void Window::setProjectionMatrix(int width, int height) {
 	this->projection[0][0] = 1.0f / (float)width;
 	this->projection[1][1] = -1.0f / (float)height;
-	projection[0][2] = -1.0f;
-	projection[1][2] = 1.0f;
+	//projection[0][2] = -1.0f;
+	//projection[1][2] = 1.0f;
 }
 
 

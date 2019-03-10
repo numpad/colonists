@@ -63,6 +63,12 @@ int main(int argc, char *argv[]) {
 		0, 0, 1
 	);
 	
+	glm::mat3 mModel(
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1
+	);
+	
 	while (window.isOpen()) {
 		glfwPollEvents();
 		
@@ -79,8 +85,8 @@ int main(int argc, char *argv[]) {
 		dMouse = mouse - pMouse;
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			mView[0][2] += dMouse.x * 2.0f;
-			mView[1][2] += dMouse.y * 2.0f;
+			mModel[0][2] += (dMouse.x * 2.0f) / mView[0][0];
+			mModel[1][2] += (dMouse.y * 2.0f) / mView[1][1];
 		}
 		
 		float zoomFactor = 1.0f + deltaScroll * 0.1f;
@@ -89,12 +95,12 @@ int main(int argc, char *argv[]) {
 		
 		
 		/* draw */
-		glClearColor(0.3, 0.3, 0.45, 1.0);
+		glClearColor(0.35, 0.3, 0.4, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDisable(GL_BLEND);
+		glEnable(GL_BLEND);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		
-		tilemap.draw(window.getProjection(), mView);
+		tilemap.draw(window.getProjection(), mView, mModel);
 		
 		window.display();
 		

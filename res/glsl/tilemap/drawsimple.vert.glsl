@@ -2,6 +2,7 @@
 
 uniform mat3 uProjection;
 uniform mat3 uView;
+uniform mat3 uModel;
 uniform sampler2D uTileset;
 uniform float uTilesize;
 
@@ -15,6 +16,6 @@ void main() {
 	vPosition = aPosition;
 	vTexCoords = aTexCoords;
 	
-	gl_Position.xyz = uProjection * uView * vec3(aPosition, 1.0);
+	gl_Position.xyz = uProjection * uView * uModel * vec3(aPosition, 1.0);
 	gl_Position.w = 1.0;
 }

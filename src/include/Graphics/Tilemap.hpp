@@ -41,7 +41,7 @@ public:
 	
 	void loadTileset(std::string path);
 
-	void draw(glm::mat3 &uProjection, glm::mat3 &uView);
+	void draw(glm::mat3 &uProjection, glm::mat3 &uView, glm::mat3 &uModel);
 };
 
 #endif

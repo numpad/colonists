@@ -63,10 +63,11 @@ void Tilemap::loadTileset(std::string path) {
 	
 }
 
-void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView) {
+void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView, glm::mat3 &uModel) {
 	tiledrawer.use();
 	tiledrawer["uProjection"] = glm::transpose(uProjection);
 	tiledrawer["uView"] = glm::transpose(uView);
+	tiledrawer["uModel"] = glm::transpose(uModel);
 	tiledrawer["uTileset"] = 0;
 	tiledrawer["uTilesize"] = (float)tilesize;
 	
@@ -76,8 +77,7 @@ void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView) {
 	glBindVertexArray(tilesVAO);	
 	glDrawArrays(GL_TRIANGLES, 0, width * height * 6);
 	glBindVertexArray(0);
-	
-	
+		
 }
 
 
@@ -109,7 +109,7 @@ void Tilemap::setTileVertices(int tx, int ty) {
 }
 
 void Tilemap::setTileTexCoords(int tx, int ty, glm::vec2 s) {
-	float pixel = 0.0001 / getTilesetSizeInPixels();
+	float pixel = 0.0001 / getTilesetSizeInPixels(); // TODO: fix texcoord errors on zoom
 	float n_tilesize = 1.0 / (double)tilesetSize;
 	int i = tileToIndex(tx, ty, width, height);
 	

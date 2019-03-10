@@ -27,4 +27,6 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 			tilemap.setTileID(x, y, id, false);
 		}
 	}
+	
+	tilemap.setTileID(tW * 0.5, tH * 0.5, 20);
 }
