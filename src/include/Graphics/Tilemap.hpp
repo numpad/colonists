@@ -25,6 +25,7 @@ class Tilemap {
 	void generateTileVertices();
 	void destroyTileVertices();
 	
+	void setTileIndices(int x, int y);
 	void setTileVertices(int tx, int ty);
 	void setTileTexCoords(int tx, int ty, glm::vec2 s);
 	
@@ -35,13 +36,17 @@ public:
 	Tilemap(int width, int height);
 	~Tilemap();
 	
+	void setProjectionMatrix(glm::mat3 &uProj);
+	void setViewMatrix(glm::mat3 &uView);
+	void setModelMatrix(glm::mat3 &uModel);
+	
 	void getSize(int *cols, int *rows);
 	
 	void setTileID(int x, int y, int id, bool is_last = true);
 	
 	void loadTileset(std::string path);
 
-	void draw(glm::mat3 &uProjection, glm::mat3 &uView, glm::mat3 &uModel);
+	void draw();
 };
 
 #endif

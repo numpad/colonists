@@ -19,7 +19,7 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 			int id = 0;
 			float noise = perlin.GetNoise(x, y) * 0.5f + 0.5f;
 			
-			if (noise > 0.50f) {
+			if (noise > 0.5f) {
 				id = 30 + rand() % 4;
 			} else {
 				id = 10 + rand() % 4;
@@ -27,6 +27,4 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 			tilemap.setTileID(x, y, id, false);
 		}
 	}
-	
-	tilemap.setTileID(tW * 0.5, tH * 0.5, 20);
 }

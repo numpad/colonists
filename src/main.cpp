@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	glfwSetCursor(window, cursor);
 	glfwSetScrollCallback(window, onScrollSetGlobal);
 	
-	Tilemap tilemap(500, 500);
+	Tilemap tilemap(250, 250); // testing 2000
 	
 	SimpleMapGenerator mgen;
 	
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 	mgen.generate(tilemap);
 	double end_s = glfwGetTime();
 	double dt = end_s - begin_s;
-	printf("generating world took %g ms.\n", dt * 1000.0f);
+	printf("Generating world took %g ms.\n", dt * 1000.0f);
 
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 		0, 1, 0,
 		0, 0, 1
 	);
-	
+	tilemap.setModelMatrix(mModel);
 	while (window.isOpen()) {
 		glfwPollEvents();
 		
@@ -87,12 +87,14 @@ int main(int argc, char *argv[]) {
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 			mModel[0][2] += (dMouse.x * 2.0f) / mView[0][0];
 			mModel[1][2] += (dMouse.y * 2.0f) / mView[1][1];
+			tilemap.setModelMatrix(mModel);
 		}
 		
 		float zoomFactor = 1.0f + deltaScroll * 0.1f;
 		mView[0][0] *= zoomFactor;
 		mView[1][1] *= zoomFactor;
-		
+		tilemap.setViewMatrix(mView);
+		tilemap.setProjectionMatrix(window.getProjection());
 		
 		/* draw */
 		glClearColor(0.35, 0.3, 0.4, 1.0);
@@ -100,7 +102,7 @@ int main(int argc, char *argv[]) {
 		glEnable(GL_BLEND);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		
-		tilemap.draw(window.getProjection(), mView, mModel);
+		tilemap.draw(/*window.getProjection(), mView, mModel*/);
 		
 		window.display();
 		

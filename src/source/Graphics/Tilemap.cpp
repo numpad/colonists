@@ -63,11 +63,11 @@ void Tilemap::loadTileset(std::string path) {
 	
 }
 
-void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView, glm::mat3 &uModel) {
+void Tilemap::draw() {
 	tiledrawer.use();
-	tiledrawer["uProjection"] = glm::transpose(uProjection);
-	tiledrawer["uView"] = glm::transpose(uView);
-	tiledrawer["uModel"] = glm::transpose(uModel);
+	//tiledrawer["uProjection"] = glm::transpose(uProjection);
+	//tiledrawer["uView"] = glm::transpose(uView);
+	//tiledrawer["uModel"] = glm::transpose(uModel);
 	tiledrawer["uTileset"] = 0;
 	tiledrawer["uTilesize"] = (float)tilesize;
 	
@@ -78,6 +78,18 @@ void Tilemap::draw(glm::mat3 &uProjection, glm::mat3 &uView, glm::mat3 &uModel) 
 	glDrawArrays(GL_TRIANGLES, 0, width * height * 6);
 	glBindVertexArray(0);
 		
+}
+
+void Tilemap::setProjectionMatrix(glm::mat3 &uProj) {
+	tiledrawer["uProjection"] = glm::transpose(uProj);
+}
+
+void Tilemap::setViewMatrix(glm::mat3 &uView) {
+	tiledrawer["uView"] = glm::transpose(uView);
+}
+
+void Tilemap::setModelMatrix(glm::mat3 &uModel) {
+	tiledrawer["uModel"] = glm::transpose(uModel);
 }
 
 
@@ -128,7 +140,7 @@ void Tilemap::loadTileVertices() {
 	
 	this->generateTileVertices();
 	
-	glBindVertexArray(tilesVAO);
+	glBindVertexArray(tilesVAO);		
 		glBindBuffer(GL_ARRAY_BUFFER, tilesVBO);
 		glBufferData(GL_ARRAY_BUFFER,
 			tileVertexData.size() * 2 * sizeof(GLfloat),
