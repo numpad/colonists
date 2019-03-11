@@ -24,7 +24,18 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 			} else {
 				id = 10 + rand() % 4;
 			}
-			tilemap.setTileID(x, y, id, false);
+			tilemap.setTileID(x, y, id);
+			
+			tilemap.setBlendTileID(x, y, 5, 20);
+			if (y > 0) {
+				int above = tilemap.getTileID(x, y - 1);
+				if (above >= 10 && above < 14) {
+					if (id < 10 || id >= 14)
+						tilemap.setBlendTileID(x, y, 8, 10);
+				}
+			} 
 		}
 	}
+	
+	tilemap.updateTileIDs();
 }

@@ -17,9 +17,13 @@ class Tilemap {
 	int tilesize = 64;
 	int tilesetTilesize = 64, tilesetSize = 10; // pixels/block, blocks_(row,col)/image
 	
-	std::vector<glm::vec2> tileVertexData, tileTexCoordData;
 	std::vector<GLuint> tileIDs;
-	GLuint tilesVAO, tilesVBO, tilesTexCoords;
+	
+	std::vector<glm::vec2> tileVertexData, tileTexCoordData,
+		blendTexCoordData, overlapTexCoordData;
+	
+	GLuint tilesVAO, tilesVBO, tilesTexCoords,
+		blendTexCoords, overlapTexCoords;
 	
 	void loadTileVertices();
 	void generateTileVertices();
@@ -27,7 +31,7 @@ class Tilemap {
 	
 	void setTileIndices(int x, int y);
 	void setTileVertices(int tx, int ty);
-	void setTileTexCoords(int tx, int ty, glm::vec2 s);
+	void setTileTexCoords(std::vector<glm::vec2> &target, int tx, int ty, glm::vec2 s);
 	
 	int getTilesetSizeInPixels();
 	
@@ -42,7 +46,11 @@ public:
 	
 	void getSize(int *cols, int *rows);
 	
-	void setTileID(int x, int y, int id, bool is_last = true);
+	int getTileID(int x, int y);
+	
+	void setTileID(int x, int y, int id);
+	void setBlendTileID(int x, int y, int blend_id, int overlap_id);
+	void updateTileIDs(); // upload changes from set*TileID() to gpu
 	
 	void loadTileset(std::string path);
 
