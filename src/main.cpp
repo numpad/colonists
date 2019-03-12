@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	glfwSetCursor(window, cursor);
 	glfwSetScrollCallback(window, onScrollSetGlobal);
 	
-	Tilemap tilemap(250, 250); // testing 2000
+	Tilemap tilemap(5, 5); // testing 2000
 	
 	SimpleMapGenerator mgen;
 	
@@ -56,6 +56,9 @@ int main(int argc, char *argv[]) {
 	double end_s = glfwGetTime();
 	double dt = end_s - begin_s;
 	printf("Generating & loading world took %g ms.\n", dt * 1000.0f);
+
+	tilemap.setTileID(2, 2, 0);
+	tilemap.updateTileIDs();
 
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,
@@ -68,6 +71,7 @@ int main(int argc, char *argv[]) {
 		0, 1, 0,
 		0, 0, 1
 	);
+	
 	tilemap.setModelMatrix(mModel);
 	while (window.isOpen()) {
 		glfwPollEvents();
@@ -85,6 +89,22 @@ int main(int argc, char *argv[]) {
 		dMouse = mouse - pMouse;
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+			glm::vec2 zoom(mView[0][0], mView[1][1]);
+			glm::vec2 offset(mModel[0][2] * 0.5f, mModel[1][2] * 0.5f);
+			glm::vec2 lcenter = glm::vec2(window.width, window.height) * 0.5f;
+			glm::vec2 cmouse = (mouse - lcenter);
+			
+			glm::vec2 world = cmouse / zoom;
+			glm::vec2 worldpos = world - offset;
+			
+			printf("\nlocal: %d, %d\n", (int)mouse.x, (int)mouse.y);
+			printf("world: %.2f, %.2f\n", offset.x, offset.y);
+			printf("global: %.2f, %.2f\n", world.x, world.y);
+			printf(" => (%.1f, %.1f)\n", worldpos.x, worldpos.y);
+			
+		}
+		
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 			mModel[0][2] += (dMouse.x * 2.0f) / mView[0][0];
 			mModel[1][2] += (dMouse.y * 2.0f) / mView[1][1];
 			tilemap.setModelMatrix(mModel);
@@ -102,7 +122,7 @@ int main(int argc, char *argv[]) {
 		glEnable(GL_BLEND);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		
-		tilemap.draw(/*window.getProjection(), mView, mModel*/);
+		tilemap.draw();
 		
 		window.display();
 		

@@ -8,6 +8,8 @@
 
 class SimpleMapGenerator : public MapGenerator {
 	
+	void generateBlends(Tilemap &tilemap);
+	
 public:
 	
 	SimpleMapGenerator();

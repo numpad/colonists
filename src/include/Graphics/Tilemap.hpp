@@ -31,7 +31,7 @@ class Tilemap {
 	
 	void setTileIndices(int x, int y);
 	void setTileVertices(int tx, int ty);
-	void setTileTexCoords(std::vector<glm::vec2> &target, int tx, int ty, glm::vec2 s);
+	void setTileTexCoords(std::vector<glm::vec2> &target, int tx, int ty, glm::vec2 s, float angle = 0.0f);
 	
 	int getTilesetSizeInPixels();
 	
@@ -45,14 +45,18 @@ public:
 	void setModelMatrix(glm::mat3 &uModel);
 	
 	void getSize(int *cols, int *rows);
+	int getWidth();
+	int getHeight();
 	
 	int getTileID(int x, int y);
 	
 	void setTileID(int x, int y, int id);
-	void setBlendTileID(int x, int y, int blend_id, int overlap_id);
+	void setBlendTileID(int x, int y, int blend_id, int overlap_id, float blend_rotation = 0.0f);
 	void updateTileIDs(); // upload changes from set*TileID() to gpu
 	
 	void loadTileset(std::string path);
+
+	glm::ivec2 mapWorldToTile(glm::vec2 pos);
 
 	void draw();
 };

@@ -35,6 +35,14 @@ void Tilemap::getSize(int *cols, int *rows) {
 	if (rows) *rows = height;
 }
 
+int Tilemap::getWidth() {
+	return width;
+}
+
+int Tilemap::getHeight() {
+	return height;
+}
+
 int Tilemap::getTileID(int x, int y) {
 	int i = tileToIndex(x, y, width, height);
 	return tileIDs.at(i);
@@ -49,14 +57,14 @@ void Tilemap::setTileID(int x, int y, int id) {
 	tileIDs.at(x + y * width) = id;
 }
 
-void Tilemap::setBlendTileID(int x, int y, int blend_id, int overlap_id) {
+void Tilemap::setBlendTileID(int x, int y, int blend_id, int overlap_id, float angle) {
 	// tile on tileset texture
 	int blend_x, blend_y;
 	int overlap_x, overlap_y;
 	indexToTile(blend_id, &blend_x, &blend_y, tilesetSize, tilesetSize);
 	indexToTile(overlap_id, &overlap_x, &overlap_y, tilesetSize, tilesetSize);
 	
-	setTileTexCoords(blendTexCoordData, x, y, glm::vec2((float)blend_x, (float)blend_y));
+	setTileTexCoords(blendTexCoordData, x, y, glm::vec2((float)blend_x, (float)blend_y), angle);
 	setTileTexCoords(overlapTexCoordData, x, y, glm::vec2((float)overlap_x, (float)overlap_y));
 }
 
@@ -88,6 +96,10 @@ void Tilemap::loadTileset(std::string path) {
 	if (!tileset->load(path)) {
 		fprintf(stderr, "Error: could not load tileset!\n");
 	}
+	
+}
+
+glm::ivec2 Tilemap::mapWorldToTile(glm::vec2 pos) {
 	
 }
 
@@ -148,17 +160,27 @@ void Tilemap::setTileVertices(int tx, int ty) {
 	tileVertexData.at(i * 6 + 5) = off + pos + tDown;
 }
 
-void Tilemap::setTileTexCoords(std::vector<glm::vec2> &target, int tx, int ty, glm::vec2 s) {
-	float pixel = 0.0001 / getTilesetSizeInPixels(); // TODO: fix texcoord errors on zoom
+void Tilemap::setTileTexCoords(std::vector<glm::vec2> &target, int tx, int ty, glm::vec2 s, float angle) {
+	float pixel = 0.1 / getTilesetSizeInPixels(); // TODO: fix texcoord errors on zoom
 	float n_tilesize = 1.0 / (double)tilesetSize;
 	int i = tileToIndex(tx, ty, width, height);
 	
-	target.at(i * 6 + 0) = s * n_tilesize + glm::vec2(0.0f + pixel,        0.0f + pixel);
-	target.at(i * 6 + 1) = s * n_tilesize + glm::vec2(n_tilesize - pixel,  0.0f + pixel);
-	target.at(i * 6 + 2) = s * n_tilesize + glm::vec2(0.0f + pixel,        n_tilesize - pixel);
-	target.at(i * 6 + 3) = s * n_tilesize + glm::vec2(n_tilesize - pixel,  0.0f + pixel);
-	target.at(i * 6 + 4) = s * n_tilesize + glm::vec2(n_tilesize - pixel,  n_tilesize - pixel);
-	target.at(i * 6 + 5) = s * n_tilesize + glm::vec2(0.0f + pixel,        n_tilesize - pixel);
+	glm::mat2 rotation(
+		cos(angle), sin(angle),
+		-sin(angle), cos(angle));
+	
+	glm::vec2 nw = glm::vec2(0.0f + pixel,        0.0f + pixel);
+	glm::vec2 ne = glm::vec2(n_tilesize - pixel,  0.0f + pixel);
+	glm::vec2 se = glm::vec2(n_tilesize - pixel,  n_tilesize - pixel);
+	glm::vec2 sw = glm::vec2(0.0f + pixel,        n_tilesize - pixel);
+	glm::vec2 halftile = se * 0.5f;
+	
+	target.at(i * 6 + 0) = s * n_tilesize + (nw - halftile) * rotation + halftile;
+	target.at(i * 6 + 1) = s * n_tilesize + (ne - halftile) * rotation + halftile;
+	target.at(i * 6 + 2) = s * n_tilesize + (sw - halftile) * rotation + halftile;
+	target.at(i * 6 + 3) = s * n_tilesize + (ne - halftile) * rotation + halftile;
+	target.at(i * 6 + 4) = s * n_tilesize + (se - halftile) * rotation + halftile;
+	target.at(i * 6 + 5) = s * n_tilesize + (sw - halftile) * rotation + halftile;
 }
 
 void Tilemap::loadTileVertices() {

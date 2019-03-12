@@ -6,16 +6,70 @@ SimpleMapGenerator::SimpleMapGenerator():
 	
 }
 
+void SimpleMapGenerator::generateBlends(Tilemap &tilemap) {
+	for (int y = 1; y < tilemap.getWidth() - 1; ++y) {
+		for (int x = 1; x < tilemap.getHeight() - 1; ++x) {
+			int id = tilemap.getTileID(x, y);
+			
+			#define is_dirt(id) (id >= 10 && id < 14)
+			#define is_3dirt(id0, id1, id2) (is_dirt(id0) && is_dirt(id1) && is_dirt(id2))
+			
+			int above = tilemap.getTileID(x, y - 1);
+			int below = tilemap.getTileID(x, y + 1);
+			int left  = tilemap.getTileID(x - 1, y);
+			int right = tilemap.getTileID(x + 1, y);
+			int nw = tilemap.getTileID(x - 1, y - 1);
+			int ne = tilemap.getTileID(x + 1, y - 1);
+			int sw = tilemap.getTileID(x - 1, y + 1);
+			int se = tilemap.getTileID(x + 1, y + 1);
+			
+			if (!is_dirt(id)) {
+				if (is_dirt(above)) {
+					tilemap.setBlendTileID(x, y, 8, above, 0.0f);
+				} else if (is_dirt(below)) {
+					tilemap.setBlendTileID(x, y, 8, below, 3.1415926f);
+				} else if (is_dirt(left)) {
+					tilemap.setBlendTileID(x, y, 8, left, 3.1415926f * 1.5f);
+				} else if (is_dirt(right)) {
+					tilemap.setBlendTileID(x, y, 8, right, 3.1415926f * 0.5f);
+				} else if (is_dirt(nw)) {
+					tilemap.setBlendTileID(x, y, 7, nw, 0.0f);
+				} else if (is_dirt(ne)) {
+					tilemap.setBlendTileID(x, y, 7, ne, 3.1415926f * 0.5f);
+				} else if (is_dirt(sw)) {
+					tilemap.setBlendTileID(x, y, 7, sw, 3.1415926f * 1.5f);
+				} else if (is_dirt(se)) {
+					tilemap.setBlendTileID(x, y, 7, se, 3.1415926f);
+				}
+				
+				if (is_3dirt(above, left, left)) {
+					tilemap.setBlendTileID(x, y, 17, left, 0.0f);
+				} else if (is_3dirt(above, right, right)) {
+					tilemap.setBlendTileID(x, y, 17, right, 3.1415926f * 0.5f);
+				} else if (is_3dirt(below, left, below)) {
+					tilemap.setBlendTileID(x, y, 17, below, 3.1415926f * 1.5f);
+				} else if (is_3dirt(below, right, right)) {
+					tilemap.setBlendTileID(x, y, 17, right, 3.1415926f);
+				}
+				
+				if (is_dirt(above) && is_3dirt(left, right, below)) {
+					tilemap.setBlendTileID(x, y, 9, above, 0.0f);
+				}
+				
+			
+			}
+		}
+	}
+}
+
 void SimpleMapGenerator::generate(Tilemap &tilemap) {
 	FastNoise perlin;
 	perlin.SetNoiseType(FastNoise::PerlinFractal);
 	perlin.SetSeed(getSeed());
 	perlin.SetFrequency(0.05f);
 	
-	int tW, tH;
-	tilemap.getSize(&tW, &tH);
-	for (int y = 0; y < tW; ++y) {
-		for (int x = 0; x < tH; ++x) {
+	for (int y = 0; y < tilemap.getWidth(); ++y) {
+		for (int x = 0; x < tilemap.getHeight(); ++x) {
 			int id = 0;
 			float noise = perlin.GetNoise(x, y) * 0.5f + 0.5f;
 			
@@ -26,16 +80,14 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 			}
 			tilemap.setTileID(x, y, id);
 			
-			tilemap.setBlendTileID(x, y, 5, 20);
-			if (y > 0) {
-				int above = tilemap.getTileID(x, y - 1);
-				if (above >= 10 && above < 14) {
-					if (id < 10 || id >= 14)
-						tilemap.setBlendTileID(x, y, 8, 10);
-				}
-			} 
+			if (x == 0 || y == 0 || x == tilemap.getWidth() - 1 || y == tilemap.getHeight() - 1) {
+				tilemap.setBlendTileID(x, y, 9, 0);
+			} else {
+				tilemap.setBlendTileID(x, y, 5, 0);
+			}
 		}
 	}
 	
+	generateBlends(tilemap);
 	tilemap.updateTileIDs();
 }
