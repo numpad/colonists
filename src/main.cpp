@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 			glm::vec2 lcenter = glm::vec2(window.width, window.height) * 0.5f;
 			glm::vec2 cmouse = (mouse - lcenter);
 			
-			glm::vec2 world = cmouse / zoom;
+			glm::vec2 world = cmouse / zoom * 2.0f;
 			glm::vec2 worldpos = world - offset;
 			
 			printf("\nlocal: %d, %d\n", (int)mouse.x, (int)mouse.y);
