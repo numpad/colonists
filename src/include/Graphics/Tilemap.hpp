@@ -3,11 +3,13 @@
 
 #include <string>
 #include <vector>
+#include <math.h>
 #include <GL/gl3w.h>
 #include <glm/glm.hpp>
 #include <FastNoise/FastNoise.h>
 #include "GLWrapper/sgl_shader.hpp"
 #include "GLWrapper/Texture.hpp"
+#include "System/Window.hpp"
 
 class Tilemap {
 	
@@ -24,6 +26,8 @@ class Tilemap {
 	
 	GLuint tilesVAO, tilesVBO, tilesTexCoords,
 		blendTexCoords, overlapTexCoords;
+	
+	glm::mat3 mView, mModel;
 	
 	void loadTileVertices();
 	void generateTileVertices();
@@ -56,8 +60,9 @@ public:
 	
 	void loadTileset(std::string path);
 
-	glm::ivec2 mapWorldToTile(glm::vec2 pos);
-
+	glm::vec2 mapLocalToWorldCoords(Window &window, glm::vec2 local);
+	glm::ivec2 mapWorldToTileCoords(glm::vec2 worldpos);
+	
 	void draw();
 };
 

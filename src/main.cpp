@@ -89,19 +89,9 @@ int main(int argc, char *argv[]) {
 		dMouse = mouse - pMouse;
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			glm::vec2 zoom(mView[0][0], mView[1][1]);
-			glm::vec2 offset(mModel[0][2] * 0.5f, mModel[1][2] * 0.5f);
-			glm::vec2 lcenter = glm::vec2(window.width, window.height) * 0.5f;
-			glm::vec2 cmouse = (mouse - lcenter);
-			
-			glm::vec2 world = cmouse / zoom * 2.0f;
-			glm::vec2 worldpos = world - offset;
-			
-			printf("\nlocal: %d, %d\n", (int)mouse.x, (int)mouse.y);
-			printf("world: %.2f, %.2f\n", offset.x, offset.y);
-			printf("global: %.2f, %.2f\n", world.x, world.y);
-			printf(" => (%.1f, %.1f)\n", worldpos.x, worldpos.y);
-			
+			glm::vec2 worldpos = tilemap.mapLocalToWorldCoords(window, mouse);
+			glm::ivec2 tp = tilemap.mapWorldToTileCoords(worldpos);
+			printf("tile: %d, %d\n", tp.x, tp.y);
 		}
 		
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {

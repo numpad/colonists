@@ -99,15 +99,26 @@ void Tilemap::loadTileset(std::string path) {
 	
 }
 
-glm::ivec2 Tilemap::mapWorldToTile(glm::vec2 pos) {
+glm::vec2 Tilemap::mapLocalToWorldCoords(Window &window, glm::vec2 local) {
+	glm::vec2 zoom(mView[0][0], mView[1][1]);
+	glm::vec2 offset(mModel[0][2] * 0.5f, mModel[1][2] * 0.5f);
+	glm::vec2 lcenter = glm::vec2(window.width, window.height) * 0.5f;
+	glm::vec2 cmouse = (local - lcenter);
 	
+	glm::vec2 world = cmouse / zoom;
+	return 2.0f * (world - offset);
+}
+
+glm::ivec2 Tilemap::mapWorldToTileCoords(glm::vec2 worldpos) {
+	return glm::ivec2(
+		(int)floor(worldpos.x + (width * tilesize) / 2) / tilesize,
+		(int)floor(worldpos.y + (height * tilesize) / 2) / tilesize
+	);
 }
 
 void Tilemap::draw() {
 	tiledrawer.use();
-	//tiledrawer["uProjection"] = glm::transpose(uProjection);
-	//tiledrawer["uView"] = glm::transpose(uView);
-	//tiledrawer["uModel"] = glm::transpose(uModel);
+	// make sure to set MVP before drawing
 	tiledrawer["uTileset"] = 0;
 	tiledrawer["uTilesize"] = (float)tilesize;
 	
@@ -125,10 +136,12 @@ void Tilemap::setProjectionMatrix(glm::mat3 &uProj) {
 }
 
 void Tilemap::setViewMatrix(glm::mat3 &uView) {
+	mView = uView;
 	tiledrawer["uView"] = glm::transpose(uView);
 }
 
 void Tilemap::setModelMatrix(glm::mat3 &uModel) {
+	mModel = uModel;
 	tiledrawer["uModel"] = glm::transpose(uModel);
 }
 
