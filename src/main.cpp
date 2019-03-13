@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	glfwSetCursor(window, cursor);
 	glfwSetScrollCallback(window, onScrollSetGlobal);
 	
-	Tilemap tilemap(5, 5); // testing 2000
+	Tilemap tilemap(250, 250); // testing 2000
 	
 	SimpleMapGenerator mgen;
 	
@@ -56,9 +56,6 @@ int main(int argc, char *argv[]) {
 	double end_s = glfwGetTime();
 	double dt = end_s - begin_s;
 	printf("Generating & loading world took %g ms.\n", dt * 1000.0f);
-
-	tilemap.setTileID(2, 2, 0);
-	tilemap.updateTileIDs();
 
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,
@@ -91,7 +88,7 @@ int main(int argc, char *argv[]) {
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 			glm::vec2 worldpos = tilemap.mapLocalToWorldCoords(window, mouse);
 			glm::ivec2 tp = tilemap.mapWorldToTileCoords(worldpos);
-			printf("tile: %d, %d\n", tp.x, tp.y);
+			printf("tile: %d\n", tilemap.getTileID(tp.x, tp.y));
 		}
 		
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
