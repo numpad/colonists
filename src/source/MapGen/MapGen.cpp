@@ -1,11 +1,11 @@
 #include "MapGen/MapGen.hpp"
 
-MapGenerator::MapGenerator(int seed):
+MapGenerator::MapGenerator(MapGenerator::SeedType seed):
 	seed(seed)
 {
 	
 }
 
-int MapGenerator::getSeed() const {
+MapGenerator::SeedType MapGenerator::getSeed() const {
 	return seed;
 }

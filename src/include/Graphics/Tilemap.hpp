@@ -52,6 +52,9 @@ public:
 	int getWidth();
 	int getHeight();
 	
+	void translate(glm::vec2 offset);
+	void scale(float s);
+	
 	int getTileID(int x, int y);
 	
 	void setTileID(int x, int y, int id);
@@ -62,6 +65,8 @@ public:
 
 	glm::vec2 mapLocalToWorldCoords(Window &window, glm::vec2 local);
 	glm::ivec2 mapWorldToTileCoords(glm::vec2 worldpos);
+	
+	void clearCache();
 	
 	void draw();
 };

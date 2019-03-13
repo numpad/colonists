@@ -24,8 +24,10 @@ bool Window::Init() {
 	return true;
 }
 
-Window::Window(int width, int height, std::string title, bool fullscreen)
-	: width(width), height(height), projection(1.0f)
+Window::Window(int width, int height, std::string title, bool fullscreen):
+	projection(1.0f),
+	width(width),
+	height(height)
 {
 	
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

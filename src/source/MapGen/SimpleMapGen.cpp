@@ -1,10 +1,17 @@
 #include "MapGen/SimpleMapGen.hpp"
 
 SimpleMapGenerator::SimpleMapGenerator():
-	MapGenerator(time(nullptr))
+	MapGenerator(time(nullptr) + rand() + 2716436)
 {
 	
 }
+
+SimpleMapGenerator::SimpleMapGenerator(MapGenerator::SeedType seed):
+	MapGenerator(seed)
+{
+	
+}
+
 
 void SimpleMapGenerator::generateBlends(Tilemap &tilemap) {
 	for (int y = 1; y < tilemap.getWidth() - 1; ++y) {
@@ -50,6 +57,22 @@ void SimpleMapGenerator::generateBlends(Tilemap &tilemap) {
 					tilemap.setBlendTileID(x, y, 17, below, 3.1415926f * 1.5f);
 				} else if (is_3dirt(below, right, right)) {
 					tilemap.setBlendTileID(x, y, 17, right, 3.1415926f);
+				}
+				
+				if (is_3dirt(above, left, below)) {
+					tilemap.setBlendTileID(x, y, 19, left, 3.1415926f * 1.0f);
+				} else if (is_3dirt(above, right, below)) {
+					tilemap.setBlendTileID(x, y, 19, right, 3.1415926f * 0.0f);
+				} else if (is_3dirt(left, above, right)) {
+					tilemap.setBlendTileID(x, y, 19, above, 3.1415926f * 1.5f);
+				} else if (is_3dirt(left, below, right)) {
+					tilemap.setBlendTileID(x, y, 19, right, 3.1415926f * 0.5f);
+				}
+				
+				if (is_dirt(above) && is_dirt(below) && !is_dirt(left) && !is_dirt(right)) {
+					tilemap.setBlendTileID(x, y, 18, above, 0.0f);
+				} else if (is_dirt(left) && is_dirt(right) && !is_dirt(above) && !is_dirt(below)) {
+					tilemap.setBlendTileID(x, y, 18, left, 3.1415926f * 0.5f);
 				}
 				
 				if (is_dirt(above) && is_3dirt(left, right, below)) {

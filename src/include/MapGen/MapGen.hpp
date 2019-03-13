@@ -4,13 +4,17 @@
 #include "Graphics/Tilemap.hpp"
 
 class MapGenerator {
-	int seed = 0;
+public:	
+	using SeedType = unsigned long int;
+	
+private:
+	SeedType seed = 0;
 	
 public:
 	
-	MapGenerator(int seed = 0);
+	MapGenerator(SeedType seed = 0);
 	
-	int getSeed() const;
+	SeedType getSeed() const;
 	
 	virtual void generate(Tilemap &tilemap) =0;
 };

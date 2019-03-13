@@ -46,6 +46,12 @@ target_link_libraries (colony
                        dl
 )
 
+if (MSVC)
+	target_compile_options (${TARGET_NAME} PRIVATE /W4 /WX)
+else (MSVC)
+	target_compile_options (colony PRIVATE -Wall -Wextra -pedantic)
+endif (MSVC)
+
 install (TARGETS colony DESTINATION bin)
 install (FILES "${PROJECT_BINARY_DIR}/config.hpp"
          DESTINATION include)

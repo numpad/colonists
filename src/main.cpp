@@ -20,11 +20,16 @@ static inline void onPressRenderWireframe(GLFWwindow *win, int key) {
 }
 
 float deltaScroll = 0.0f;
-static void onScrollSetGlobal(GLFWwindow *window, double xoff, double yoff) {
+static void onScrollSetGlobal(GLFWwindow *, double xoff, double yoff) {
+	(void)xoff;
+	
 	deltaScroll = yoff;
 }
 
 int main(int argc, char *argv[]) {
+	(void)argc;
+	(void)argv;
+	
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
 	Window::Init();
@@ -55,8 +60,9 @@ int main(int argc, char *argv[]) {
 	mgen.generate(tilemap);
 	double end_s = glfwGetTime();
 	double dt = end_s - begin_s;
-	printf("Generating & loading world took %g ms.\n", dt * 1000.0f);
-
+	printf("Generating world with seed %lu took %g ms.\n", mgen.getSeed(), dt * 1000.0f);
+	tilemap.clearCache();
+	
 	glm::mat3 mView(
 		1, 0, 0, //window.mouse.x * 2.0 - window.width,
 		0, 1, 0, //window.mouse.y * -2.0 + window.height,
@@ -92,15 +98,11 @@ int main(int argc, char *argv[]) {
 		}
 		
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-			mModel[0][2] += (dMouse.x * 2.0f) / mView[0][0];
-			mModel[1][2] += (dMouse.y * 2.0f) / mView[1][1];
-			tilemap.setModelMatrix(mModel);
+			tilemap.translate(dMouse);
 		}
 		
 		float zoomFactor = 1.0f + deltaScroll * 0.1f;
-		mView[0][0] *= zoomFactor;
-		mView[1][1] *= zoomFactor;
-		tilemap.setViewMatrix(mView);
+		tilemap.scale(zoomFactor);
 		tilemap.setProjectionMatrix(window.getProjection());
 		
 		/* draw */

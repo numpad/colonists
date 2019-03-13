@@ -12,13 +12,15 @@ static inline void indexToTile(size_t index, int *tx, int *ty, int w, int h) {
 }
 
 Tilemap::Tilemap(int w, int h):
-	width(w), height(h),
 	tiledrawer("res/glsl/tilemap/drawsimple.vert.glsl", "res/glsl/tilemap/drawsimple.frag.glsl"),
-	tileVertexData(w * h * 6),
+	width(w), height(h),
 	tileIDs(w * h),
+	tileVertexData(w * h * 6),
 	tileTexCoordData(w * h * 6),
 	blendTexCoordData(w * h * 6),
-	overlapTexCoordData(w * h * 6)
+	overlapTexCoordData(w * h * 6),
+	mView(1.0f),
+	mModel(1.0f)
 {
 	this->loadTileset("res/tileset.png");
 	this->loadTileVertices();
@@ -41,6 +43,18 @@ int Tilemap::getWidth() {
 
 int Tilemap::getHeight() {
 	return height;
+}
+
+void Tilemap::translate(glm::vec2 offset) {
+	mModel[0][2] += (offset.x * 2.0f) / mView[0][0];
+	mModel[1][2] += (offset.y * 2.0f) / mView[1][1];
+	setModelMatrix(mModel);
+}
+
+void Tilemap::scale(float s) {
+	mView[0][0] *= s;
+	mView[1][1] *= s;
+	setViewMatrix(mView);
 }
 
 int Tilemap::getTileID(int x, int y) {
@@ -145,6 +159,13 @@ void Tilemap::setModelMatrix(glm::mat3 &uModel) {
 	tiledrawer["uModel"] = glm::transpose(uModel);
 }
 
+
+void Tilemap::clearCache() {
+	tileVertexData.resize(1);
+	tileTexCoordData.resize(1);
+	blendTexCoordData.resize(1);
+	overlapTexCoordData.resize(1);
+}
 
 /// PRIVATE
 
