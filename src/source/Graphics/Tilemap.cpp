@@ -24,6 +24,9 @@ Tilemap::Tilemap(int w, int h):
 {
 	this->loadTileset("res/tileset.png");
 	this->loadTileVertices();
+	
+	this->setModelMatrix(mModel);
+	this->setViewMatrix(mView);
 }
 
 Tilemap::~Tilemap() {

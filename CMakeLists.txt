@@ -20,6 +20,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}")
 set (CFG_VERSION_MAJOR 0)
 set (CFG_VERSION_MINOR 1)
 set (CFG_DEBUG true)
+set (CFG_IMGUI_ENABLED true)
 configure_file (
 	"${PROJECT_BASE_SRC}/config.hpp.in"
 	"${PROJECT_BINARY_DIR}/config.hpp"
@@ -27,11 +28,15 @@ configure_file (
 include_directories ("${PROJECT_BINARY_DIR}")
 include_directories ("${PROJECT_INCLUDE_DIR}")
 include_directories ("${PROJECT_LIBRARY_DIR}")
+include_directories ("${PROJECT_LIBRARY_DIR}/imgui")
+include_directories ("${PROJECT_LIBRARY_DIR}/imgui/examples")
 
 file (GLOB source_files
 	"${PROJECT_SOURCE_DIR}/*.cpp"
 	"${PROJECT_SOURCE_DIR}/*/*.cpp"
 	"${PROJECT_LIBRARY_DIR}/*/*.cpp"
+	"${PROJECT_LIBRARY_DIR}/imgui/examples/imgui_impl_glfw.cpp"
+	"${PROJECT_LIBRARY_DIR}/imgui/examples/imgui_impl_opengl3.cpp"
 )
 
 set (OpenGL_GL_PREFERENCE GLVND)

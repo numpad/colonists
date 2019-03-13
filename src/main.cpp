@@ -14,6 +14,8 @@
 #include "MapGen/MapGen.hpp"
 #include "MapGen/SimpleMapGen.hpp"
 
+#include "System/ImUtil.hpp"
+
 static inline void onPressRenderWireframe(GLFWwindow *win, int key) {
 	glPolygonMode(GL_FRONT_AND_BACK,
 		(glfwGetKey(win, key) == GLFW_PRESS) ? GL_LINE : GL_FILL);
@@ -42,6 +44,9 @@ int main(int argc, char *argv[]) {
 		glGetString(GL_VERSION),
 		glGetString(GL_SHADING_LANGUAGE_VERSION));
 	
+	/* imgui setup */
+	ImUtil::Init(window);
+	
 	/* glfw setup */
 	int cw, ch, cch;
 	GLubyte *cdata = stbi_load("res/images/cursor/pointer.png", &cw, &ch, &cch, 0);
@@ -61,25 +66,14 @@ int main(int argc, char *argv[]) {
 	double end_s = glfwGetTime();
 	double dt = end_s - begin_s;
 	printf("Generating world with seed %lu took %g ms.\n", mgen.getSeed(), dt * 1000.0f);
-	tilemap.clearCache();
+	//tilemap.clearCache();
 	
-	glm::mat3 mView(
-		1, 0, 0, //window.mouse.x * 2.0 - window.width,
-		0, 1, 0, //window.mouse.y * -2.0 + window.height,
-		0, 0, 1
-	);
-	
-	glm::mat3 mModel(
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1
-	);
-	
-	tilemap.setModelMatrix(mModel);
 	while (window.isOpen()) {
 		glfwPollEvents();
 		
 		/* debug */
+		ImUtil::PrepareFrame();
+		
 		onPressRenderWireframe(window, GLFW_KEY_R);
 		
 		/* update */
@@ -92,9 +86,7 @@ int main(int argc, char *argv[]) {
 		dMouse = mouse - pMouse;
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			glm::vec2 worldpos = tilemap.mapLocalToWorldCoords(window, mouse);
-			glm::ivec2 tp = tilemap.mapWorldToTileCoords(worldpos);
-			printf("tile: %d\n", tilemap.getTileID(tp.x, tp.y));
+			
 		}
 		
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
@@ -105,6 +97,30 @@ int main(int argc, char *argv[]) {
 		tilemap.scale(zoomFactor);
 		tilemap.setProjectionMatrix(window.getProjection());
 		
+		/* draw imgui */
+		if (ImUtil::Enabled()) {
+			if (ImGui::Begin("Info")) {
+				glm::vec2 worldpos = tilemap.mapLocalToWorldCoords(window, mouse);
+				glm::ivec2 tp = tilemap.mapWorldToTileCoords(worldpos);
+				ImGui::Text("Mouse: %.1f, %.1f\n", worldpos.x, worldpos.y);
+				ImGui::Text(" As Tile: %d, %d\n", tp.x, tp.y);
+				
+				ImGui::Separator();
+				
+				static int tilepos[2];
+				static int tid = 0;
+				ImGui::InputInt2("Tile", tilepos);
+				ImGui::InputInt("ID", &tid);
+				ImGui::SameLine();
+				if (ImGui::Button("Set Tile")) {
+					tilemap.setTileID(tilepos[0], tilepos[1], tid);
+					tilemap.updateTileIDs();
+				}
+				
+			}
+			ImGui::End();
+		}
+		
 		/* draw */
 		glClearColor(0.35, 0.3, 0.4, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -112,14 +128,16 @@ int main(int argc, char *argv[]) {
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		
 		tilemap.draw();
-		
+		ImUtil::RenderFrame();
 		window.display();
+		
 		
 		/* after frame stuff */
 		pMouse = mouse;
 		deltaScroll = 0.0f;
 	}
-		
+	
+	ImUtil::Destroy();
 	stbi_image_free(cdata);
 	glfwDestroyCursor(cursor);
 	window.close();
