@@ -12,11 +12,23 @@ SimpleMapGenerator::SimpleMapGenerator(MapGenerator::SeedType seed):
 	
 }
 
+static inline int neighbors_dirt(Tilemap &tm, int ox, int oy) {
+	int cnt = 0;
+	for (int y = -1; y <= 1; ++y) {
+		for (int x = -1; x <= 1; ++x) {
+			if (x == 0 && y == 0) continue;
+			int id = tm.getTileID(ox + x, oy + y);
+			if (id >= 10 && id < 14) ++cnt;
+		}
+	}
+	return cnt;
+}
 
 void SimpleMapGenerator::generateBlends(Tilemap &tilemap) {
 	for (int y = 1; y < tilemap.getWidth() - 1; ++y) {
 		for (int x = 1; x < tilemap.getHeight() - 1; ++x) {
 			int id = tilemap.getTileID(x, y);
+			tilemap.setBlendTileID(x, y, 5, 0);
 			
 			#define is_dirt(id) (id >= 10 && id < 14)
 			#define is_3dirt(id0, id1, id2) (is_dirt(id0) && is_dirt(id1) && is_dirt(id2))
@@ -75,6 +87,21 @@ void SimpleMapGenerator::generateBlends(Tilemap &tilemap) {
 					tilemap.setBlendTileID(x, y, 18, left, 3.1415926f * 0.5f);
 				}
 				
+				if (is_dirt(ne) && is_dirt(se) && !is_dirt(right) && !is_dirt(above) && !is_dirt(below)) {
+					tilemap.setBlendTileID(x, y, 18, left, 3.1415926f * 0.5f);
+				}
+				
+				int dirt_neighs = neighbors_dirt(tilemap, x, y);
+				
+				if (is_dirt(nw) && is_dirt(se) && dirt_neighs == 2) {
+					tilemap.setBlendTileID(x, y, 28, nw, 3.1415926f * 0.0f);
+				} else if (is_dirt(ne) && is_dirt(sw) && dirt_neighs == 2) {
+					tilemap.setBlendTileID(x, y, 28, ne, 3.1415926f * 0.5f);
+				}
+				if (dirt_neighs == 4 && is_dirt(ne) && is_dirt(nw) && is_dirt(se) && is_dirt(sw)) {
+					tilemap.setBlendTileID(x, y, 29, ne, 3.1415926f * 0.0f);
+				}
+				
 				if (is_dirt(above) && is_3dirt(left, right, below)) {
 					tilemap.setBlendTileID(x, y, 9, above, 0.0f);
 				}
@@ -83,6 +110,10 @@ void SimpleMapGenerator::generateBlends(Tilemap &tilemap) {
 			}
 		}
 	}
+}
+
+void SimpleMapGenerator::blend(Tilemap &tilemap) {
+	generateBlends(tilemap);
 }
 
 void SimpleMapGenerator::generate(Tilemap &tilemap) {
@@ -111,6 +142,6 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 		}
 	}
 	
-	generateBlends(tilemap);
+	blend(tilemap);
 	tilemap.updateTileIDs();
 }

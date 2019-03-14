@@ -97,28 +97,35 @@ int main(int argc, char *argv[]) {
 		tilemap.scale(zoomFactor);
 		tilemap.setProjectionMatrix(window.getProjection());
 		
+		glm::vec2 mouseWorld = tilemap.mapLocalToWorldCoords(window, mouse);
+		glm::ivec2 mouseTile = tilemap.mapWorldToTileCoords(mouseWorld);
+		static bool place_mode = false;
+		static int tid = 0;
+		
 		/* draw imgui */
 		if (ImUtil::Enabled()) {
 			if (ImGui::Begin("Info")) {
-				glm::vec2 worldpos = tilemap.mapLocalToWorldCoords(window, mouse);
-				glm::ivec2 tp = tilemap.mapWorldToTileCoords(worldpos);
-				ImGui::Text("Mouse: %.1f, %.1f\n", worldpos.x, worldpos.y);
-				ImGui::Text(" As Tile: %d, %d\n", tp.x, tp.y);
+				ImGui::Text("Mouse: %.1f, %.1f\n", mouseWorld.x, mouseWorld.y);
+				ImGui::Text(" As Tile: %d, %d\n", mouseTile.x, mouseTile.y);
 				
 				ImGui::Separator();
 				
-				static int tilepos[2];
-				static int tid = 0;
-				ImGui::InputInt2("Tile", tilepos);
 				ImGui::InputInt("ID", &tid);
 				ImGui::SameLine();
-				if (ImGui::Button("Set Tile")) {
-					tilemap.setTileID(tilepos[0], tilepos[1], tid);
-					tilemap.updateTileIDs();
+				if (ImGui::Checkbox("Place ID", &place_mode)) {
+					//tilemap.setTileID(tilepos[0], tilepos[1], tid);
+					//mgen.blend(tilemap);
+					//tilemap.updateTileIDs();
 				}
 				
 			}
 			ImGui::End();
+		}
+		
+		if (place_mode && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+			tilemap.setTileID(mouseTile.x, mouseTile.y, tid);
+			mgen.blend(tilemap);
+			tilemap.updateTileIDs();
 		}
 		
 		/* draw */

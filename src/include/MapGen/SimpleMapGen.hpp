@@ -16,6 +16,8 @@ public:
 	SimpleMapGenerator();
 	SimpleMapGenerator(MapGenerator::SeedType seed);
 	
+	void blend(Tilemap &tilemap);
+	
 	virtual void generate(Tilemap &tilemap);
 };
 
