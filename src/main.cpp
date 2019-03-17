@@ -1,6 +1,8 @@
 #include "config.hpp"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <FastNoise/FastNoise.h>
@@ -31,6 +33,7 @@ static void onScrollSetGlobal(GLFWwindow *, double xoff, double yoff) {
 int main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
+	srand(time(nullptr));
 	
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
@@ -57,7 +60,7 @@ int main(int argc, char *argv[]) {
 	glfwSetCursor(window, cursor);
 	glfwSetScrollCallback(window, onScrollSetGlobal);
 	
-	Tilemap tilemap(250, 250); // testing 2000
+	Tilemap tilemap(300, 300); // testing 2000
 	
 	SimpleMapGenerator mgen;
 	
@@ -99,6 +102,7 @@ int main(int argc, char *argv[]) {
 		
 		glm::vec2 mouseWorld = tilemap.mapLocalToWorldCoords(window, mouse);
 		glm::ivec2 mouseTile = tilemap.mapWorldToTileCoords(mouseWorld);
+		glm::vec2 tileWorld = tilemap.mapTileToWorldCoords(mouseTile);
 		static bool place_mode = false;
 		static int tid = 0;
 		
@@ -106,17 +110,14 @@ int main(int argc, char *argv[]) {
 		if (ImUtil::Enabled()) {
 			if (ImGui::Begin("Info")) {
 				ImGui::Text("Mouse: %.1f, %.1f\n", mouseWorld.x, mouseWorld.y);
-				ImGui::Text(" As Tile: %d, %d\n", mouseTile.x, mouseTile.y);
-				
+				ImGui::Text("Tile: '%d' at (%d,%d).\n",
+					tilemap.getTileID(mouseTile.x, mouseTile.y), mouseTile.x, mouseTile.y);
+				ImGui::Text("Tile Pos: %g,%g\n", tileWorld.x, tileWorld.y);
 				ImGui::Separator();
 				
 				ImGui::InputInt("ID", &tid);
 				ImGui::SameLine();
-				if (ImGui::Checkbox("Place ID", &place_mode)) {
-					//tilemap.setTileID(tilepos[0], tilepos[1], tid);
-					//mgen.blend(tilemap);
-					//tilemap.updateTileIDs();
-				}
+				ImGui::Checkbox("Place ID", &place_mode);
 				
 			}
 			ImGui::End();

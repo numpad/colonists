@@ -1,7 +1,7 @@
 #include "MapGen/SimpleMapGen.hpp"
 
 SimpleMapGenerator::SimpleMapGenerator():
-	MapGenerator(time(nullptr) + rand() + 2716436)
+	MapGenerator(time(nullptr) + rand() + (17 * rand() % 1723) * (rand() % 2 ? 1 : -1))
 {
 	
 }

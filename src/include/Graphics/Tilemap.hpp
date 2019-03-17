@@ -66,6 +66,8 @@ public:
 	glm::vec2 mapLocalToWorldCoords(Window &window, glm::vec2 local);
 	glm::ivec2 mapWorldToTileCoords(glm::vec2 worldpos);
 	
+	glm::vec2 mapTileToWorldCoords(glm::ivec2 tilepos);
+	
 	void clearCache();
 	
 	void draw();

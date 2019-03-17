@@ -61,6 +61,8 @@ void Tilemap::scale(float s) {
 }
 
 int Tilemap::getTileID(int x, int y) {
+	if (x < 0 || y < 0 || x >= width || y >= height) return -1;
+	
 	int i = tileToIndex(x, y, width, height);
 	return tileIDs.at(i);
 }
@@ -128,9 +130,13 @@ glm::vec2 Tilemap::mapLocalToWorldCoords(Window &window, glm::vec2 local) {
 
 glm::ivec2 Tilemap::mapWorldToTileCoords(glm::vec2 worldpos) {
 	return glm::ivec2(
-		(int)floor(worldpos.x + (width * tilesize) / 2) / tilesize,
-		(int)floor(worldpos.y + (height * tilesize) / 2) / tilesize
+		(int)(worldpos.x + (width * tilesize) / 2) / tilesize,
+		(int)(worldpos.y + (height * tilesize) / 2) / tilesize
 	);
+}
+
+glm::vec2 Tilemap::mapTileToWorldCoords(glm::ivec2 tilepos) {
+	return ((glm::vec2)tilepos - glm::vec2(ceil(width / 2.0f), ceil(height / 2.0f))) * (float)tilesize + glm::vec2(tilesize * 0.5f);
 }
 
 void Tilemap::draw() {

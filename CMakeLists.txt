@@ -18,7 +18,7 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_LIBRARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_BINARY_DIR}")
 
 set (CFG_VERSION_MAJOR 0)
-set (CFG_VERSION_MINOR 1)
+set (CFG_VERSION_MINOR 2)
 set (CFG_DEBUG true)
 set (CFG_IMGUI_ENABLED true)
 configure_file (
@@ -46,7 +46,7 @@ find_package (glm REQUIRED)
 
 add_executable (colony "${PROJECT_BASE_SRC}/main.cpp" ${source_files})
 target_link_libraries (colony
-                       GL
+                       OpenGL
                        glfw
                        dl
 )
