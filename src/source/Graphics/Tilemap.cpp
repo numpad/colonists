@@ -170,6 +170,10 @@ void Tilemap::setModelMatrix(glm::mat3 &uModel) {
 
 
 void Tilemap::clearCache() {
+	tileVertexData.clear();
+	tileTexCoordData.clear();
+	blendTexCoordData.clear();
+	overlapTexCoordData.clear();
 	tileVertexData.resize(1);
 	tileTexCoordData.resize(1);
 	blendTexCoordData.resize(1);

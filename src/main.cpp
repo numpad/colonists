@@ -17,18 +17,7 @@
 #include "MapGen/SimpleMapGen.hpp"
 
 #include "System/ImUtil.hpp"
-
-static inline void onPressRenderWireframe(GLFWwindow *win, int key) {
-	glPolygonMode(GL_FRONT_AND_BACK,
-		(glfwGetKey(win, key) == GLFW_PRESS) ? GL_LINE : GL_FILL);
-}
-
-float deltaScroll = 0.0f;
-static void onScrollSetGlobal(GLFWwindow *, double xoff, double yoff) {
-	(void)xoff;
-	
-	deltaScroll = yoff;
-}
+#include "States/GameState.hpp"
 
 int main(int argc, char *argv[]) {
 	(void)argc;
@@ -38,7 +27,7 @@ int main(int argc, char *argv[]) {
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
 	Window::Init();
-	Window window(800, 600, "main");
+	Window window(800, 640, "main");
 	
 	if (gl3wInit()) {
 		fprintf(stderr, "gl3wInit() failed.\n");
@@ -49,6 +38,7 @@ int main(int argc, char *argv[]) {
 	
 	/* imgui setup */
 	ImUtil::Init(window);
+	State *currentState = nullptr;
 	
 	/* glfw setup */
 	int cw, ch, cch;
@@ -58,7 +48,6 @@ int main(int argc, char *argv[]) {
 	img.pixels = cdata;
 	GLFWcursor *cursor = glfwCreateCursor(&img, 0, 0);
 	glfwSetCursor(window, cursor);
-	glfwSetScrollCallback(window, onScrollSetGlobal);
 	
 	Tilemap tilemap(300, 300); // testing 2000
 	
@@ -71,80 +60,22 @@ int main(int argc, char *argv[]) {
 	printf("Generating world with seed %lu took %g ms.\n", mgen.getSeed(), dt * 1000.0f);
 	//tilemap.clearCache();
 	
+	delete currentState;
+	currentState = new GameState(window, tilemap);
+	
 	while (window.isOpen()) {
 		glfwPollEvents();
 		
 		/* debug */
 		ImUtil::PrepareFrame();
 		
-		onPressRenderWireframe(window, GLFW_KEY_R);
+		currentState->draw();
 		
-		/* update */
-		static glm::vec2 mouse, pMouse, dMouse; // current, prev, delta
-		static double mDX, mDY;
-		glfwGetCursorPos(window, &mDX, &mDY);
-		mouse.x = mDX;
-		mouse.y = mDY;
-		
-		dMouse = mouse - pMouse;
-
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			
-		}
-		
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-			tilemap.translate(dMouse);
-		}
-		
-		float zoomFactor = 1.0f + deltaScroll * 0.1f;
-		tilemap.scale(zoomFactor);
-		tilemap.setProjectionMatrix(window.getProjection());
-		
-		glm::vec2 mouseWorld = tilemap.mapLocalToWorldCoords(window, mouse);
-		glm::ivec2 mouseTile = tilemap.mapWorldToTileCoords(mouseWorld);
-		glm::vec2 tileWorld = tilemap.mapTileToWorldCoords(mouseTile);
-		static bool place_mode = false;
-		static int tid = 0;
-		
-		/* draw imgui */
-		if (ImUtil::Enabled()) {
-			if (ImGui::Begin("Info")) {
-				ImGui::Text("Mouse: %.1f, %.1f\n", mouseWorld.x, mouseWorld.y);
-				ImGui::Text("Tile: '%d' at (%d,%d).\n",
-					tilemap.getTileID(mouseTile.x, mouseTile.y), mouseTile.x, mouseTile.y);
-				ImGui::Text("Tile Pos: %g,%g\n", tileWorld.x, tileWorld.y);
-				ImGui::Separator();
-				
-				ImGui::InputInt("ID", &tid);
-				ImGui::SameLine();
-				ImGui::Checkbox("Place ID", &place_mode);
-				
-			}
-			ImGui::End();
-		}
-		
-		if (place_mode && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			tilemap.setTileID(mouseTile.x, mouseTile.y, tid);
-			mgen.blend(tilemap);
-			tilemap.updateTileIDs();
-		}
-		
-		/* draw */
-		glClearColor(0.35, 0.3, 0.4, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
-		
-		tilemap.draw();
 		ImUtil::RenderFrame();
 		window.display();
-		
-		
-		/* after frame stuff */
-		pMouse = mouse;
-		deltaScroll = 0.0f;
 	}
 	
+	delete currentState;
 	ImUtil::Destroy();
 	stbi_image_free(cdata);
 	glfwDestroyCursor(cursor);
