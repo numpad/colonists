@@ -6,6 +6,10 @@ MapGenerator::MapGenerator(MapGenerator::SeedType seed):
 	
 }
 
+MapGenerator::~MapGenerator() {
+	
+}
+
 MapGenerator::SeedType MapGenerator::getSeed() const {
 	return seed;
 }

@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
 	currentState->drawUntilFinished(window);
 	delete currentState;
 	
+	
 	ImUtil::Destroy();
 	stbi_image_free(cdata);
 	glfwDestroyCursor(cursor);

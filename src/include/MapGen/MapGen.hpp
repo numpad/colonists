@@ -13,6 +13,7 @@ private:
 public:
 	
 	MapGenerator(SeedType seed = 0);
+	virtual ~MapGenerator();
 	
 	SeedType getSeed() const;
 	

@@ -8,8 +8,9 @@ void ImUtil::Init(Window &window) {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
 	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-
+	ImGui::StyleColorsLight();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330 core");
