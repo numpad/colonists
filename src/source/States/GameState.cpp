@@ -9,7 +9,7 @@ static void onScrollSetGlobal(GLFWwindow *, double xoff, double yoff) {
 }
 
 
-static inline void renderWireframe(GLFWwindow *win, bool enabled) {
+static inline void renderWireframe(GLFWwindow *, bool enabled) {
 	glPolygonMode(GL_FRONT_AND_BACK, enabled ? GL_LINE : GL_FILL);
 }
 
@@ -54,7 +54,11 @@ void GameState::draw() {
 	
 	/* draw imgui */
 	if (ImUtil::Enabled()) {
-		if (ImGui::Begin("Tilemap")) {
+		static char titleFormatted[32] = {0};
+		sprintf(titleFormatted, "Tilemap %dx%d",
+			tilemap.getWidth(), tilemap.getHeight());
+		
+		if (ImGui::Begin(titleFormatted)) {
 			ImGui::Text("Mouse: %.1f, %.1f\n", mouseWorld.x, mouseWorld.y);
 			ImGui::Text("Tile: '%d' at (%d,%d).\n",
 				tilemap.getTileID(mouseTile.x, mouseTile.y), mouseTile.x, mouseTile.y);

@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 	printf("version: %d.%d\n", CFG_VERSION_MAJOR, CFG_VERSION_MINOR);
 	
 	Window::Init();
-	Window window(800, 640, "main");
+	Window window(800, 720, "main");
 	
 	if (gl3wInit()) {
 		fprintf(stderr, "gl3wInit() failed.\n");
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	GLFWcursor *cursor = glfwCreateCursor(&img, 0, 0);
 	glfwSetCursor(window, cursor);
 	
-	Tilemap tilemap(300, 300); // testing 2000
+	Tilemap tilemap(500, 500); // testing 2000
 	
 	SimpleMapGenerator mgen;
 	
@@ -63,17 +63,7 @@ int main(int argc, char *argv[]) {
 	delete currentState;
 	currentState = new GameState(window, tilemap);
 	
-	while (window.isOpen()) {
-		glfwPollEvents();
-		
-		/* debug */
-		ImUtil::PrepareFrame();
-		
-		currentState->draw();
-		
-		ImUtil::RenderFrame();
-		window.display();
-	}
+	currentState->drawUntilFinished(window);
 	
 	delete currentState;
 	ImUtil::Destroy();
@@ -81,5 +71,6 @@ int main(int argc, char *argv[]) {
 	glfwDestroyCursor(cursor);
 	window.close();
 	glfwTerminate();
+	printf("\ncleanup complete, quitting now...\n\n");
 	return 0;
 }
