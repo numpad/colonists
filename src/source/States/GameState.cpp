@@ -55,7 +55,7 @@ void GameState::draw() {
 	/* draw imgui */
 	if (ImUtil::Enabled()) {
 		static char titleFormatted[32] = {0};
-		sprintf(titleFormatted, "Tilemap %dx%d",
+		sprintf(titleFormatted, "Tilemap %dx%d##Tilemap",
 			tilemap.getWidth(), tilemap.getHeight());
 		
 		if (ImGui::Begin(titleFormatted)) {

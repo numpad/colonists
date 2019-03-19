@@ -42,6 +42,10 @@ class Tilemap {
 public:
 	
 	Tilemap(int width, int height);
+	
+	Tilemap();
+	void create(int width, int height);
+	
 	~Tilemap();
 	
 	void setProjectionMatrix(glm::mat3 &uProj);

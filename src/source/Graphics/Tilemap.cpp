@@ -11,17 +11,33 @@ static inline void indexToTile(size_t index, int *tx, int *ty, int w, int h) {
 	*ty = index / w;
 }
 
-Tilemap::Tilemap(int w, int h):
-	tiledrawer("res/glsl/tilemap/drawsimple.vert.glsl", "res/glsl/tilemap/drawsimple.frag.glsl"),
-	width(w), height(h),
-	tileIDs(w * h),
-	tileVertexData(w * h * 6),
-	tileTexCoordData(w * h * 6),
-	blendTexCoordData(w * h * 6),
-	overlapTexCoordData(w * h * 6),
+Tilemap::Tilemap(int w, int h) {
+	create(w, h);
+}
+
+Tilemap::Tilemap():
 	mView(1.0f),
 	mModel(1.0f)
 {
+	
+}
+
+void Tilemap::create(int w, int h) {
+	tiledrawer.load("res/glsl/tilemap/drawsimple.vert.glsl", sgl::shader::VERTEX);
+	tiledrawer.load("res/glsl/tilemap/drawsimple.frag.glsl", sgl::shader::FRAGMENT);
+	tiledrawer.compile();
+	tiledrawer.link();
+	
+	width = w;
+	height = h;
+	tileIDs.resize(w * h),
+	tileVertexData.resize(w * h * 6),
+	tileTexCoordData.resize(w * h * 6),
+	blendTexCoordData.resize(w * h * 6),
+	overlapTexCoordData.resize(w * h * 6),
+	mView = glm::mat3(1.0f);
+	mModel = glm::mat3(1.0f);
+	
 	this->loadTileset("res/tileset.png");
 	this->loadTileVertices();
 	

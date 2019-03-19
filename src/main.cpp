@@ -13,10 +13,9 @@
 
 #include "System/Window.hpp"
 #include "Graphics/Tilemap.hpp"
-#include "MapGen/MapGen.hpp"
-#include "MapGen/SimpleMapGen.hpp"
 
 #include "System/ImUtil.hpp"
+#include "States/MapGenState.hpp"
 #include "States/GameState.hpp"
 
 int main(int argc, char *argv[]) {
@@ -49,23 +48,16 @@ int main(int argc, char *argv[]) {
 	GLFWcursor *cursor = glfwCreateCursor(&img, 0, 0);
 	glfwSetCursor(window, cursor);
 	
-	Tilemap tilemap(500, 500); // testing 2000
+	Tilemap tilemap;
 	
-	SimpleMapGenerator mgen;
-	
-	double begin_s = glfwGetTime();
-	mgen.generate(tilemap);
-	double end_s = glfwGetTime();
-	double dt = end_s - begin_s;
-	printf("Generating world with seed %lu took %g ms.\n", mgen.getSeed(), dt * 1000.0f);
-	//tilemap.clearCache();
-	
-	delete currentState;
-	currentState = new GameState(window, tilemap);
-	
+	currentState = new MapGenState(tilemap);
 	currentState->drawUntilFinished(window);
-	
 	delete currentState;
+	
+	currentState = new GameState(window, tilemap);
+	currentState->drawUntilFinished(window);
+	delete currentState;
+	
 	ImUtil::Destroy();
 	stbi_image_free(cdata);
 	glfwDestroyCursor(cursor);

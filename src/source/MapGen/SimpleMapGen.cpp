@@ -125,7 +125,7 @@ void SimpleMapGenerator::generate(Tilemap &tilemap) {
 	for (int y = 0; y < tilemap.getWidth(); ++y) {
 		for (int x = 0; x < tilemap.getHeight(); ++x) {
 			int id = 0;
-			float noise = perlin.GetNoise(x, y) * 0.5f + 0.5f;
+			float noise = perlin.GetNoise(x - tilemap.getWidth() * 0.5, y - tilemap.getHeight() * 0.5) * 0.5f + 0.5f;
 			
 			if (noise > 0.5f) {
 				id = 30 + rand() % 4;
