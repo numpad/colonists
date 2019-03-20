@@ -26,6 +26,29 @@ void Texture::setTextureData(int w, int h, int ch) {
 	this->channels = ch;
 }
 
+void Texture::updateTextureFromMemory(GLubyte *bitmap) {
+	set(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	set(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	set(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	set(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
+	bind(true);
+	
+	glTexSubImage2D(
+		GL_TEXTURE_2D,
+		0,
+		0, 0,
+		this->width, this->height,
+		channelsToFormat(this->channels),
+		GL_UNSIGNED_BYTE,
+		bitmap
+	);
+	
+	if (generateMipmapOnLoad) glGenerateMipmap(GL_TEXTURE_2D);
+	
+	bind(false);
+}
+
 void Texture::loadTextureFromMemory(GLubyte *bitmap) {
 	glGenTextures(1, &this->texture);
 	
@@ -39,7 +62,7 @@ void Texture::loadTextureFromMemory(GLubyte *bitmap) {
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		GL_RGBA32F,
+		channelsToFormat(this->channels),
 		this->width, this->height,
 		0,
 		channelsToFormat(this->channels),

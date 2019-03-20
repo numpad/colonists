@@ -1,22 +1,27 @@
 #include "MapGen/PerlinMapGen.hpp"
 
+static inline float clamp1(float v) {
+	return fmaxf(0.0f, fminf(1.0f, v));
+}
+
 PerlinMapGen::PerlinMapGen(int seed):
 	MapGenerator(seed)
 {
+	pnoise.SetNoiseType(FastNoise::Perlin);
 	pnoise.SetSeed(seed);
 	pnoise.SetFrequency(1.0f);
 }
 
 void PerlinMapGen::generate(Tilemap &tilemap) {
-	//printf("noise = %g\n", noise(3, 0, octaves));
-	
 	for (int y = 0; y < tilemap.getHeight(); ++y) {
 		for (int x = 0; x < tilemap.getWidth(); ++x) {
-			float elevation = noise(x, y, octaves);
+			float elevation = getElevationAt(x, y);
 			
 			tilemap.setBlendTileID(x, y, 5, 9);
-			if (elevation < 0.5f) {
+			if (elevation < 0.33f) {
 				tilemap.setTileID(x, y, 40);
+			} else if (elevation < 0.66f) {
+				tilemap.setTileID(x, y, 10);
 			} else {
 				tilemap.setTileID(x, y, 30);
 			}
@@ -39,19 +44,23 @@ void PerlinMapGen::setFrequency(float freq) {
 }
 
 float PerlinMapGen::getElevationAt(float x, float y) {
-	return noise(x, y, octaves);
+	return clamp1(powf(noise(x, y, octaves) * 0.5f + 0.5f, exponent));
 }
 
 /////////////
 // PRIVATE //
 /////////////
 
-float PerlinMapGen::noise(float x, float y, int octave) {
-	if (!octave) return 0.0f;
+float PerlinMapGen::noise(float x, float y, int octaves) {
+	float e = 0.0f;
 	
-	float oct = pow(2, octave - 1);
-	float n = (1.0f / oct) * powf(pnoise.GetNoise(x * oct, y * oct) * 0.5f + 0.5f, exponent);
-	//printf("%g * noise(x * %d, y * %d) = %g\n", 1.0f / oct, (int)oct, (int)oct, n);
+	for (int i = 0; i < octaves; ++i) {
+		float f = powf(2.0f, (float)i);
+		float s = 1.0f / f;
+		e += s * pnoise.GetNoise(x * f, y * f);
+		
+	}
+	//printf(" = %g\n\n", e);
 	
-	return n + noise(x, y, octave - 1);
+	return e;
 }

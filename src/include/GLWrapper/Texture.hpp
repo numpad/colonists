@@ -27,6 +27,7 @@ public:
 	void bind(bool active = true);
 	void active(int unit);
 	
+	void updateTextureFromMemory(GLubyte *bitmap);
 	void loadTextureFromMemory(GLubyte *bitmap);
 	void setTextureData(int width, int height, int channels);
 	

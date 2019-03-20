@@ -5,7 +5,7 @@
 #include "MapGen/MapGen.hpp"
 #include "MapGen/SimpleMapGen.hpp"
 #include "MapGen/PerlinMapGen.hpp"
-
+#include "GLWrapper/Texture.hpp"
 #include "Graphics/Tilemap.hpp"
 #include <imgui.h>
 
@@ -13,14 +13,20 @@ class MapGenState : public State {
 	Tilemap &tilemap;
 	
 	int map_seed = rand();
+	int map_size = 256;
 	
 	std::vector<char *> mapGens;
 	int currentMapGen = 1;
 	MapGenerator *getMapGen();
 	
+	Texture heightmapPreview;
+	void renderHeightmapPreview();
+	
 	int genOctaves = 1;
 	float genRedistExp = 1.0f;
-	float genFreq = 1.0f;
+	float genFreq = 0.05f;
+	
+	void presetsWindow();
 	
 public:
 	
