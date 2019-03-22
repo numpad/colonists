@@ -4,17 +4,21 @@
 #include "MapGen/MapGen.hpp"
 
 #include <math.h>
-#include "Graphics/Tilemap.hpp"
 #include <FastNoise/FastNoise.h>
+#include "Graphics/Tilemap.hpp"
+#include "System/RangeDecider.hpp"
 
 class PerlinMapGen : public MapGenerator {
 	FastNoise pnoise;
+	
+	RangeDecider<int> biomeConditions;
 	
 	float noise(float x, float y, int octaves);
 	
 	int octaves = 1;
 	float exponent = 1.0f;
 	
+	float xOff = 0.0f, yOff = 0.0f;
 public:
 	
 	PerlinMapGen(int seed);
@@ -24,6 +28,9 @@ public:
 	void setOctaves(int octaves);
 	void setExponent(float exp);
 	void setFrequency(float freq);
+	void setNoiseShift(float x, float y);
+	
+	RangeDecider<int> &getTileConditions();
 	
 	float getElevationAt(float x, float y);
 };

@@ -26,6 +26,11 @@ class MapGenState : public State {
 	float genRedistExp = 1.0f;
 	float genFreq = 0.05f;
 	
+	std::vector<float> biomeRanges;
+	std::vector<int> biomeTiles;
+	float shiftOffset[2];
+	void addBiome(int tileID, float minRange);
+	
 	void presetsWindow();
 	
 public:

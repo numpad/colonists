@@ -38,7 +38,7 @@ void Tilemap::create(int w, int h) {
 	mView = glm::mat3(1.0f);
 	mModel = glm::mat3(1.0f);
 	
-	this->loadTileset("res/tileset.png");
+	this->loadTileset("res/tileset_new.png");
 	this->loadTileVertices();
 	
 	this->setModelMatrix(mModel);
