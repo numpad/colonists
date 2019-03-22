@@ -233,7 +233,7 @@ void MapGenState::renderHeightmapPreview() {
 		}
 	}
 	
-	if (heightmapPreview.getWidth() == map_size && heightmapPreview.getWidth() == map_size) {
+	if (heightmapPreview.getWidth() == map_size && heightmapPreview.getHeight() == map_size) {
 		heightmapPreview.updateTextureFromMemory(&pixels[0]);
 	} else {
 		heightmapPreview.destroy();
