@@ -12,7 +12,6 @@
 #include "System/Window.hpp"
 
 class Tilemap {
-	
 	sgl::shader tiledrawer;
 	Texture *tileset = nullptr;
 	int width, height; // tile grid size: (width, height)

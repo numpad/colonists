@@ -30,15 +30,15 @@ void Tilemap::create(int w, int h) {
 	
 	width = w;
 	height = h;
-	tileIDs.resize(w * h),
-	tileVertexData.resize(w * h * 6),
-	tileTexCoordData.resize(w * h * 6),
-	blendTexCoordData.resize(w * h * 6),
-	overlapTexCoordData.resize(w * h * 6),
+	tileIDs.resize(w * h);
+	tileVertexData.resize(w * h * 6);
+	tileTexCoordData.resize(w * h * 6);
+	blendTexCoordData.resize(w * h * 6);
+	overlapTexCoordData.resize(w * h * 6);
 	mView = glm::mat3(1.0f);
 	mModel = glm::mat3(1.0f);
 	
-	this->loadTileset("res/tileset_new.png");
+	this->loadTileset("res/tileset.png");
 	this->loadTileVertices();
 	
 	this->setModelMatrix(mModel);
@@ -131,6 +131,9 @@ void Tilemap::loadTileset(std::string path) {
 	if (!tileset->load(path)) {
 		fprintf(stderr, "Error: could not load tileset!\n");
 	}
+	
+	tileset->set(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	tileset->set(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	
 }
 

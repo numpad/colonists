@@ -130,8 +130,6 @@ void MapGenState::presetsWindow() {
 				genFreq = 0.02f;
 				biomeRanges.clear();
 				biomeTiles.clear();
-				shiftOffset[0] = 0.0f;
-				shiftOffset[1] = 0.0f;
 				addBiome(41, 0.0f);
 				addBiome(40, 0.22f);
 				addBiome(30, 0.482f);
@@ -146,8 +144,6 @@ void MapGenState::presetsWindow() {
 				genFreq = 0.005f;
 				biomeRanges.clear();
 				biomeTiles.clear();
-				shiftOffset[0] = 0.0f;
-				shiftOffset[1] = 0.0f;
 				addBiome(40, 0.0f);
 				addBiome(20, 0.145f);
 				addBiome(10, 0.325f);
@@ -161,8 +157,6 @@ void MapGenState::presetsWindow() {
 				genFreq = 0.006f;
 				biomeRanges.clear();
 				biomeTiles.clear();
-				shiftOffset[0] = 0.0f;
-				shiftOffset[1] = 0.0f;
 				addBiome(41, 0.0f);
 				addBiome(40, 0.2f);
 				addBiome(20, 0.265f);
@@ -213,7 +207,7 @@ void MapGenState::renderHeightmapPreview() {
 	gen->setNoiseShift(shiftOffset[0], shiftOffset[1]);
 	for (int y = 0; y < map_size; ++y) {
 		for (int x = 0; x < map_size; ++x) {
-			float e = gen->getElevationAt(x + shiftOffset[0], y + shiftOffset[1]);
+			float e = gen->getElevationAt(x, y);
 			int tileID = gen->getTileConditions().at(e);
 			float r = 1.0f, g = 1.0f, b = 1.0f;
 			
