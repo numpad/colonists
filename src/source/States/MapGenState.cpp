@@ -20,7 +20,7 @@ double MapGenState::generate(int w, int h) {
 	generator->generate(tilemap);
 	double end_s = glfwGetTime();
 	double dt = end_s - begin_s;
-	tilemap.clearCache();
+	//tilemap.clearCache();
 	
 	delete generator;
 	

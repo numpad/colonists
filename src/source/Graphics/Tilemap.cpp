@@ -51,6 +51,10 @@ Tilemap::~Tilemap() {
 	destroyTileVertices();
 }
 
+bool Tilemap::inside(int x, int y) {
+	return (x >= 0 && y >= 0 && x < width && y < height);
+}
+
 void Tilemap::getSize(int *cols, int *rows) {
 	if (cols) *cols = width;
 	if (rows) *rows = height;
@@ -81,6 +85,10 @@ int Tilemap::getTileID(int x, int y) {
 	
 	int i = tileToIndex(x, y, width, height);
 	return tileIDs.at(i);
+}
+
+glm::vec2 *Tilemap::getTileTexCoords(int x, int y) {
+	return &tileTexCoordData.at(tileToIndex(x, y, width, height) * 6);
 }
 
 void Tilemap::setTileID(int x, int y, int id) {
@@ -197,6 +205,7 @@ void Tilemap::clearCache() {
 	tileTexCoordData.resize(1);
 	blendTexCoordData.resize(1);
 	overlapTexCoordData.resize(1);
+	fprintf(stdout, "cleared tilemap\n");
 }
 
 /// PRIVATE

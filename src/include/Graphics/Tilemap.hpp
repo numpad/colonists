@@ -47,6 +47,9 @@ public:
 	
 	~Tilemap();
 	
+	
+	bool inside(int x, int y);
+	
 	void setProjectionMatrix(glm::mat3 &uProj);
 	void setViewMatrix(glm::mat3 &uView);
 	void setModelMatrix(glm::mat3 &uModel);
@@ -59,6 +62,8 @@ public:
 	void scale(float s);
 	
 	int getTileID(int x, int y);
+	
+	glm::vec2 *getTileTexCoords(int x, int y);
 	
 	void setTileID(int x, int y, int id);
 	void setBlendTileID(int x, int y, int blend_id, int overlap_id, float blend_rotation = 0.0f);

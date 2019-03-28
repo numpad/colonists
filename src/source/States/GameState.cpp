@@ -33,10 +33,6 @@ void GameState::draw() {
 	mouse.y = mDY;
 	
 	dMouse = mouse - pMouse;
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		
-	}
 	
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 		tilemap.translate(dMouse);
@@ -49,8 +45,16 @@ void GameState::draw() {
 	glm::vec2 mouseWorld = tilemap.mapLocalToWorldCoords(window, mouse);
 	glm::ivec2 mouseTile = tilemap.mapWorldToTileCoords(mouseWorld);
 	glm::vec2 tileWorld = tilemap.mapTileToWorldCoords(mouseTile);
+	
+	static glm::ivec2 selectedTile(0);
 	static bool place_mode = false, wireframe = false;
 	static int tid = 0;
+	
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+		&& !ImGui::GetIO().WantCaptureMouse)
+	{
+		selectedTile = mouseTile;
+	}
 	
 	/* draw imgui */
 	if (ImUtil::Enabled()) {
@@ -59,6 +63,7 @@ void GameState::draw() {
 			tilemap.getWidth(), tilemap.getHeight());
 		
 		if (ImGui::Begin(titleFormatted)) {
+			ImGui::TextColored(ImVec4(0.92, 0.7, 0.0, 1.0), "FPS: %.1f", ImGui::GetIO().Framerate);
 			ImGui::Text("Mouse: %.1f, %.1f\n", mouseWorld.x, mouseWorld.y);
 			ImGui::Text("Tile: '%d' at (%d,%d).\n",
 				tilemap.getTileID(mouseTile.x, mouseTile.y), mouseTile.x, mouseTile.y);
@@ -74,10 +79,36 @@ void GameState::draw() {
 			
 		}
 		ImGui::End();
+		
+		if (tilemap.inside(selectedTile.x, selectedTile.y)
+			&& ImGui::Begin("Selected Tile"))
+		{
+			glm::vec2 *tileTexCoords = tilemap.getTileTexCoords(selectedTile.x, selectedTile.y);
+			ImGui::Text("Selected Tile: (%d, %d)", selectedTile.x, selectedTile.y);
+			ImGui::Text(" ID: %d", tilemap.getTileID(selectedTile.x, selectedTile.y));
+			ImGui::Text("TexCoords:");
+			ImGui::InputFloat2("Top-Left", (float *)(tileTexCoords) + 0 * 2);
+			ImGui::InputFloat2("Top-Right", (float *)(tileTexCoords) + 1 * 2);
+			ImGui::InputFloat2("Bottom-Left", (float *)(tileTexCoords) + 2 * 2);
+			ImGui::InputFloat2("Bottom-Right", (float *)(tileTexCoords) + 4 * 2);
+			tileTexCoords[3] = tileTexCoords[1];
+			tileTexCoords[5] = tileTexCoords[2];
+			
+			if (ImGui::Button("Update")) {
+				tilemap.updateTileIDs();
+			}
+			
+		}
+		ImGui::End();
+		
 	}
 	
 	renderWireframe(window, wireframe);
-	if (place_mode && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+	
+	// TODO: will not compile when imgui disabled
+	if (place_mode && !ImGui::GetIO().WantCaptureMouse
+		&& glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
 		tilemap.setTileID(mouseTile.x, mouseTile.y, tid);
 		//mgen.blend(tilemap);
 		tilemap.updateTileIDs();
